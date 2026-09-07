@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Plan du site — Digistylze
+  Genere le 2026-08-04.
+
+  Ce fichier existe pour une raison precise : les 16 pages geo sont passees
+  en <meta name="robots" content="noindex,follow"> et leur seul chemin de
+  crawl etait le strip du pied de page, qu on retire. Sans plan de site,
+  Googlebot n aurait plus aucun moyen de revenir lire ce noindex, et les
+  pages resteraient indexees indefiniment.
+
+  Les URL sont reprises telles quelles des <link rel="canonical"> des pages
+  qui en portent un, pour qu il ne puisse pas y avoir deux adresses pour une
+  meme page.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Pages indexables (18) -->
+  <url>
+    <loc>https://digistylze.ch/agence-google-ads.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://digistylze.ch/agence-linkedin-ads.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://digistylze.ch/agence-meta-ads.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://digistylze.ch/agence-seo.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://digistylze.ch/agence-tiktok-ads.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://digistylze.ch/agence.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://digistylze.ch/branding.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://digistylze.ch/community-management.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://digistylze.ch/contact.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://digistylze.ch/creation-site-web.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://digistylze.ch/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://digistylze.ch/mentions-legales.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://digistylze.ch/politique-de-confidentialite.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://digistylze.ch/publicite-en-ligne.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://digistylze.ch/realisations.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://digistylze.ch/saas-applications.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://digistylze.ch/tarifs.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!--
+    Pages geo (16) — EN PAUSE D INDEXATION, presence TEMPORAIRE.
+    Elles ne sont pas ici pour etre indexees : elles portent un noindex.
+    Elles y sont pour rester CRAWLABLES le temps que Google lise ce noindex
+    et les sorte de l index. A retirer de ce fichier une fois la
+    desindexation constatee dans Search Console.
+  -->
+  <url>
+    <loc>https://digistylze.ch/agence-adwords-geneve.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
+  </url>
+  <url>
+    <loc>https://digistylze.ch/agence-de-communication-geneve.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
+  </url>
+  <url>
+    <loc>https://digistylze.ch/agence-de-communication-lausanne.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
+  </url>
+  <url>
+    <loc>https://digistylze.ch/agence-de-creation-site-internet-geneve.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
+  </url>
+  <url>
+    <loc>https://digistylze.ch/agence-digitale-geneve.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
+  </url>
+  <url>
+    <loc>https://digistylze.ch/agence-digitale-lausanne.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
+  </url>
+  <url>
+    <loc>https://digistylze.ch/agence-e-commerce-suisse.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
+  </url>
+  <url>
+    <loc>https://digistylze.ch/agence-google-ads-lausanne.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
+  </url>
+  <url>
+    <loc>https://digistylze.ch/agence-graphisme-lausanne.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
+  </url>
+  <url>
+    <loc>https://digistylze.ch/agence-graphisme-suisse.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
+  </url>
+  <url>
+    <loc>https://digistylze.ch/agence-reseaux-sociaux-en-suisse.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
+  </url>
+  <url>
+    <loc>https://digistylze.ch/agence-seo-geneve.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
+  </url>
+  <url>
+    <loc>https://digistylze.ch/agence-seo-lausanne.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
+  </url>
+  <url>
+    <loc>https://digistylze.ch/agence-web-geneve.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
+  </url>
+  <url>
+    <loc>https://digistylze.ch/creation-de-site-web-a-lausanne.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
+  </url>
+  <url>
+    <loc>https://digistylze.ch/publicite-facebook-suisse.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
+  </url>
+
+</urlset>

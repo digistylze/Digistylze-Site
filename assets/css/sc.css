@@ -1,0 +1,375 @@
+/* ================================================================
+   DIGISTYLZE — LA COUCHE COMPOSANT DE SECTION
+
+   Créée le 2026-08-12. Chargée après site.css, avant le <style> de
+   page et avant premium.css.
+
+   ------------------------------------------------------------------
+   POURQUOI UNE TROISIÈME BIBLIOTHÈQUE, ALORS QUE DEUX SONT MORTES
+
+   Le site en a déjà eu deux, et aucune n'a jamais été adoptée :
+   `compose.css` (14 archétypes `.ar-*`) et la partie `.dz-*` de
+   `sections.css`. Zéro usage sur 34 pages, retirées le 2026-08-12.
+
+   La raison de leur mort n'est pas technique, elle est cognitive :
+   **elles nommaient les composants par leur MISE EN PAGE** — `ar-split`,
+   `ar-bento`, `ar-ledger` — alors que l'auteur d'une page cherche par
+   RÔLE : « est-ce pour vous », « ce qui est inclus », « parlons vrai ».
+   Le pont mental ne se faisait pas, et personne n'a jamais migré une
+   page existante. Résultat mesuré avant ce lot : 159 sections bâties
+   sur 100 classes racines, dont 84 n'existaient que sur une seule page,
+   et 2 439 des 2 956 règles de `<style>` inline présentes sur une page
+   et une seule.
+
+   LA RÈGLE QUI CHANGE TOUT :
+
+       le CSS nomme le GABARIT,  le HTML nomme le RÔLE.
+
+   <section class="sc sc--grid sc--sand"      ← mise en page, partagée
+                data-role="qualification"      ← sens, ne porte AUCUN style
+                id="pour-qui">                 ← ancre
+
+   `data-role` et `id` rendent la section trouvable par son sens — pour
+   l'auteur, pour les ancres, pour l'analytics — sans créer une classe
+   de plus. Une classe de rôle, c'est une classe qui n'existera que sur
+   une page. C'est exactement ce qu'on vient de retirer.
+
+   ------------------------------------------------------------------
+   CE FICHIER NE CONTIENT QUE CE QUI EST DÉJÀ CONSOMMÉ
+
+   Le châssis, les axes de variante, et les primitives partagées.
+   **Pas de gabarit écrit d'avance.** Chaque gabarit est ajouté ici au
+   moment où une page réelle le réclame, jamais avant — c'est la seule
+   différence de méthode avec les deux bibliothèques mortes, et c'est
+   elle qui décide de l'adoption.
+
+   ------------------------------------------------------------------
+   CE QU'IL NE FAUT PAS Y ÉCRIRE
+
+   1. Aucun `opacity:0` qui ne soit pas derrière `html.wf-js.has-fx`.
+      Sans JS, sans GSAP, en mouvement réduit, la classe n'arrive jamais
+      et la page doit rester entièrement lisible. C'est l'invariant n°1
+      du site. Garde : `grep -n "opacity:0" sc.css` ne doit rendre que
+      des lignes précédées de `html.wf-js.has-fx`.
+   2. Aucune largeur de conteneur. La largeur appartient à `.wrap`
+      (`site.css`), la gouttière à la section. `tools/rail.py --check`.
+   3. Aucun point de rupture hors 520/640/720/860/960/1120, et aucun
+      `min-width`. `tools/bp.py --check`.
+   4. Aucun `1fr` nu dans une grille destinée à se replier : `minmax(0,1fr)`.
+   ================================================================ */
+
+
+/* ============================================================
+   1 — LE CHÂSSIS
+
+   Une seule règle porte la gouttière et la respiration verticale,
+   pour toutes les sections du site. Le conteneur intérieur reste
+   `.wrap` / `.wrap--col`, inchangé.
+   ============================================================ */
+.sc{position:relative;padding-block:var(--section-y);padding-inline:var(--gutter)}
+/* `isolation` et non `z-index` : les décors (`.fx-stage`, grains, lueurs)
+   se composent DANS la section sans jamais passer devant le contenu de la
+   suivante. Sans lui, une lueur de -40% déborde sur la section précédente. */
+.sc--decor{isolation:isolate;overflow:clip}
+.sc--decor > .wrap{position:relative;z-index:1}
+
+
+/* ============================================================
+   2 — L'AXE DE VALEUR
+
+   Trois surfaces, et trois seulement : clair 100 / crème 93 / encre 4.
+   Le site en déclarait quatre à moins de 3 points d'écart, donc une.
+
+   LA LOI, à tenir à la relecture de chaque page :
+     a. jamais deux sections consécutives de la même valeur ;
+     b. une bande d'encre tous les 3 à 4 écrans, jamais deux d'affilée ;
+     c. l'encre est un argument, pas une décoration — quatre rôles
+        seulement y ont droit : la preuve, l'objection, le manifeste,
+        la clôture. Le BUILD-GUIDE plafonne à 2 sections nuit par page :
+        au-delà, c'est `.sc-panel` qu'il faut employer, pas une nuit de plus ;
+     d. premier écran clair, dernier écran encre.
+   ============================================================ */
+.sc--sand{background:var(--sand)}
+.sc--night{background:var(--night);color:var(--night-fg)}
+.sc--night .eyebrow{color:var(--night-fg)}
+.sc--night .section-head p,
+.sc--night .microcopy{color:var(--night-muted)}
+.sc--night a:not([class]){color:var(--night-fg)}
+
+/* LE PANNEAU D'ENCRE — de l'encre DANS une section claire.
+   Reprend la composition de `.nightp` (premium-pages.css:78), qui était
+   écrite et servait sur une seule page. C'est la façon d'obtenir un accent
+   sombre sans consommer le quota de sections nuit.
+   La section garde sa gouttière, le panneau porte le décor. */
+.sc-panel{position:relative;isolation:isolate;overflow:clip;
+  border-radius:2.2rem;color:var(--night-fg);
+  background:
+    radial-gradient(30rem 20rem at 12% 8%,rgba(255,255,255,.10),transparent 60%),
+    radial-gradient(36rem 24rem at 90% 92%,rgba(255,255,255,.07),transparent 64%),
+    linear-gradient(170deg,#17171D 0%,var(--night) 55%,#101016 100%);
+  padding:clamp(2.6rem,5.5vw,4.4rem) clamp(1.4rem,4vw,3.6rem);
+  box-shadow:0 40px 90px -50px rgba(14,14,18,.85)}
+.sc-panel > *{position:relative;z-index:1}
+.sc-panel .eyebrow{color:var(--night-fg)}
+.sc-panel .section-head p{color:var(--night-muted)}
+
+
+/* ============================================================
+   3 — L'AXE DE DENSITÉ
+
+   Le site n'avait qu'un cran : 102px en haut et en bas, partout, sur
+   douze sections d'affilée. Neuf des douze sections de l'accueil
+   tenaient entre 0,8 et 1,2 écran — l'œil descendait sans jamais
+   rencontrer de rupture.
+
+   LA LOI : jamais trois sections consécutives au même cran.
+   ============================================================ */
+.sc--tight{padding-block:var(--sy-tight)}
+.sc--tall{padding-block:var(--sy-tall)}
+
+/* Le plein écran. `min-height` et jamais `height` : une section dont le
+   contenu déborde doit grandir, pas rogner.
+   `svh` et non `vh` : sur iOS, `vh` ignore la barre d'URL et fait dépasser
+   la section d'environ 90px au chargement. La ligne `vh` reste au-dessus
+   comme repli pour les moteurs sans `svh`.
+   `- var(--head)` n'est pas cosmétique : `.header` occupe 4.2rem de flux,
+   un `100svh` sec pousse le bas de la section sous la ligne de flottaison
+   sur TOUS les écrans. */
+.sc--screen{--head:4.2rem;
+  min-height:calc(100vh - var(--head));
+  min-height:calc(100svh - var(--head));
+  display:grid;align-content:center}
+/* Une page de service fait déjà 23,5 écrans à 375px. Un plein écran imposé
+   à un gabarit dont la scène s'empile sous la copy pousse le premier CTA à
+   près de deux écrans de profondeur. La hauteur d'écran est une règle de
+   grand format. */
+@media (max-width:720px){
+  .sc--screen{min-height:auto}
+}
+
+
+/* ============================================================
+   4 — LES PRIMITIVES PARTAGÉES
+
+   Les briques que tous les gabarits réemploient. Elles ne décident
+   d'aucune mise en page de section : elles se posent dedans.
+   ============================================================ */
+
+/* La grille de cartes. `minmax(0,1fr)` et jamais `1fr` : `1fr` vaut
+   `minmax(auto,1fr)`, la colonne garde la largeur min-content de son
+   contenu comme plancher, et c'est la page qui déborde. */
+.sc-grid{display:grid;gap:clamp(1rem,2.2vw,1.6rem);
+  grid-template-columns:repeat(var(--sc-cols,3),minmax(0,1fr))}
+.sc-grid--2{--sc-cols:2}
+.sc-grid--3{--sc-cols:3}
+.sc-grid--4{--sc-cols:4}
+@media (max-width:960px){ .sc-grid{--sc-cols:2} }
+@media (max-width:640px){ .sc-grid{--sc-cols:1} }
+
+/* La carte. Contour et non ombre : le site est blanc dominant, une ombre
+   par carte y fait du bruit. L'ombre est réservée à ce qui est posé SUR
+   autre chose (`.sc-panel`, les cartes en avant). */
+.sc-card{position:relative;display:flex;flex-direction:column;
+  gap:.55rem;padding:clamp(1.2rem,2.4vw,1.7rem);
+  border:1px solid var(--line);border-radius:var(--radius-lg);
+  background:var(--bg)}
+.sc-card h3{font-size:1.05rem;font-weight:600;letter-spacing:-.01em}
+.sc-card p{color:var(--muted);line-height:1.6}
+/* Le filet d'accent est un `::after` et non une `border` : une bordure
+   décalerait la boîte de 1px au survol, et un `outline` l'emporterait sur
+   l'anneau de `:focus-visible`. */
+.sc-card::after{content:"";position:absolute;inset:0;pointer-events:none;
+  border-radius:inherit;box-shadow:inset 0 0 0 1px transparent;
+  transition:box-shadow .3s var(--ease-out)}
+@media (hover:hover) and (pointer:fine){
+  .sc-card:hover::after{box-shadow:inset 0 0 0 1px var(--fg-soft)}
+}
+.sc--night .sc-card,
+.sc-panel .sc-card{background:linear-gradient(160deg,rgba(255,255,255,.06),rgba(255,255,255,.016));
+  border-color:rgba(255,255,255,.11)}
+.sc--night .sc-card p,
+.sc-panel .sc-card p{color:var(--night-muted)}
+
+/* Le split asymétrique. 55/45 et non 50/50 : deux colonnes égales lisent
+   « tableau », pas « composition ». `--sc-split` permet d'inverser sans
+   toucher à l'ordre du DOM. */
+.sc-split{display:grid;gap:clamp(1.6rem,4vw,3.2rem);align-items:center;
+  grid-template-columns:minmax(0,var(--sc-split,55fr)) minmax(0,45fr)}
+.sc-split--flip{--sc-split:45fr}
+.sc-split--flip > :first-child{order:2}
+@media (max-width:860px){
+  .sc-split{grid-template-columns:minmax(0,1fr)}
+  .sc-split--flip > :first-child{order:0}
+}
+
+/* La séquence ordonnée. Le numéro est un filigrane, pas une pastille :
+   une pastille numérotée par étape est le marqueur visuel du gabarit
+   générique. */
+.sc-steps{display:grid;gap:clamp(1.1rem,2.4vw,1.8rem)}
+.sc-step{position:relative;padding-left:clamp(2.6rem,5vw,3.4rem)}
+.sc-step__n{position:absolute;left:0;top:-.1em;
+  font-size:clamp(1.6rem,3.2vw,2.2rem);font-weight:700;line-height:1;
+  letter-spacing:-.04em;color:transparent;-webkit-text-stroke:1.5px var(--line)}
+.sc--night .sc-step__n{-webkit-text-stroke-color:rgba(255,255,255,.22)}
+.sc-step h3{font-size:1.05rem;font-weight:600}
+.sc-step p{color:var(--muted);line-height:1.6;max-width:var(--measure)}
+.sc--night .sc-step p{color:var(--night-muted)}
+
+
+/* ============================================================
+   5 — LE GABARIT « ÉNONCÉ »
+
+   Le seul gabarit ajouté d'emblée, parce qu'il ne remplace rien : il
+   n'existait nulle part.
+
+   Le site n'avait aucun endroit où la page se tait. Chaque section
+   devait démontrer quelque chose, et comme le vocabulaire ne contenait
+   aucun gabarit court, chaque section faisait un écran plein. C'est
+   mécanique, et c'est la cause de fond du mono-rythme.
+
+   Une phrase, beaucoup de blanc, rien d'autre. C'est la respiration.
+   ============================================================ */
+.sc--statement{text-align:center}
+.sc-statement{max-width:var(--maxw-col);margin-inline:auto;
+  font-size:clamp(1.5rem,3.4vw,2.4rem);font-weight:600;
+  letter-spacing:-.025em;line-height:1.22;text-wrap:balance}
+.sc-statement em{font-style:normal;color:var(--muted)}
+.sc--night .sc-statement em{color:var(--night-muted)}
+.sc-statement__src{display:block;margin-top:1.4rem;
+  font-size:.8125rem;font-weight:500;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--muted)}
+.sc--night .sc-statement__src{color:var(--night-muted)}
+
+
+/* ============================================================
+   6 — MOUVEMENT RÉDUIT
+
+   La règle globale de site.css coupe les ANIMATIONS, pas les
+   transitions. Ici tout est en transition de survol, donc sous
+   `(hover:hover)` — mais on la double par principe : c'est le piège
+   documenté quatre fois dans ce dépôt.
+   ============================================================ */
+@media (prefers-reduced-motion:reduce){
+  .sc-card::after{transition:none}
+}
+
+/* ============================================================
+   7 — LA CARTE-LIEN
+
+   Ajoutée pour l'index des expertises de l'accueil : une carte
+   entièrement cliquable, avec son pictogramme, son intitulé et sa
+   promesse. Premier gabarit ajouté selon la règle du fichier —
+   au moment où une page réelle le réclame, pas avant.
+
+   C'est un `<a>` : toute la carte est la cible, il n'y a pas de
+   « lire la suite » à viser au pixel. La flèche est un signe, pas
+   un bouton — d'où `aria-hidden` sur son SVG et un intitulé de lien
+   qui se suffit à lui-même.
+   ============================================================ */
+.sc-card--lien{color:inherit;text-decoration:none;gap:.7rem;
+  transition:transform .35s var(--ease-out),border-color .35s var(--ease-out)}
+.sc-card__picto{--picto-taille:1.75rem;color:var(--dz-accent,var(--fg))}
+.sc-card--lien h3{font-size:1.15rem}
+.sc-card--lien p{flex:1}
+.sc-card__aller{display:inline-flex;align-items:center;gap:.4rem;
+  margin-top:.2rem;font-size:.85rem;font-weight:600;color:var(--dz-accent,var(--fg))}
+.sc-card__aller svg{width:1.05rem;height:1.05rem;
+  transition:transform .35s var(--ease-back)}
+@media (hover:hover) and (pointer:fine){
+  .sc-card--lien:hover{transform:translateY(-3px);border-color:var(--fg-soft)}
+  .sc-card--lien:hover .sc-card__aller svg{transform:translateX(.28rem)}
+}
+/* Le focus clavier doit être aussi net que le survol : la carte est
+   la cible, l'anneau doit donc la ceindre elle, pas son texte. */
+.sc-card--lien:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+@media (prefers-reduced-motion:reduce){
+  .sc-card--lien,.sc-card__aller svg{transition:none}
+}
+
+/* ============================================================
+   8 — LA GRILLE CHROMATIQUE
+
+   Motif relevé sur React Bits (« Chroma Grid »), réécrit ici.
+   Chez eux : une grille de cartes désaturées qu'un projecteur suivant
+   le curseur repeint. Le principe transposé au site : les six cartes
+   d'expertise portent chacune la teinte de son domaine, et cette teinte
+   n'ÉCLÔT que sous le curseur, proportionnellement à la distance.
+
+   Pourquoi c'est le bon geste ici plutôt qu'un simple survol : le
+   styleguide dit « la couleur du domaine en accents SUBTILS, jamais
+   d'aplat ». Une grille de six teintes allumées en permanence est un
+   aplat de six couleurs. Une grille neutre où la couleur naît sous la
+   main dit la même chose sans l'imposer.
+
+   `--chroma` va de 0 à 1, posée par la scène `chroma` de fx.js en
+   quickTo — une seule écoute déléguée sur la grille, six interpolations.
+
+   DÉGRADATION : la règle sans `color-mix` reste au-dessus. Un moteur qui
+   ne connaît pas `color-mix` ignore la seconde déclaration et garde la
+   couleur pleine — c'est-à-dire le rendu d'avant. Au pointeur grossier
+   la scène ne monte pas et `--chroma` reste à 0 : les cartes sont alors
+   neutres, ce qui est le repos voulu, et le picto garde son encre.
+   ============================================================ */
+/* La valeur de depart doit EXISTER : gsap.quickTo lit la valeur courante
+   pour interpoler, et une variable jamais declaree rend une chaine vide
+   que GSAP ne sait pas prendre comme origine. On la pose donc a 0. */
+.sc-grid--chroma .sc-card{--chroma:0}
+.sc-grid--chroma .sc-card__picto,
+.sc-grid--chroma .sc-card__aller{color:var(--dz-accent,var(--fg))}
+@supports (color: color-mix(in srgb, red, blue)){
+  @media (hover:hover) and (pointer:fine){
+    .sc-grid--chroma .sc-card__picto,
+    .sc-grid--chroma .sc-card__aller{
+      color:color-mix(in srgb,
+        var(--fg) calc((1 - var(--chroma,0)) * 100%),
+        var(--dz-accent,var(--fg)) calc(var(--chroma,0) * 100%))}
+    /* Le liseré supérieur prend la teinte en même temps : c'est lui qui
+       fait lire la carte comme un objet coloré, pas seulement son picto. */
+    .sc-grid--chroma .sc-card--lien::after{
+      box-shadow:inset 0 2px 0 0 color-mix(in srgb,
+        transparent calc((1 - var(--chroma,0)) * 100%),
+        var(--dz-accent,var(--fg)) calc(var(--chroma,0) * 100%))}
+  }
+}
+
+/* ============================================================
+   9 — LA LUEUR DE BORDURE (cartes d'encre)
+
+   Motif « Magic Bento » relevé sur React Bits : la bordure de la carte
+   s'allume à l'endroit où passe le curseur, pas uniformément. C'est ce
+   qui distingue une carte qui réagit d'une carte qui s'éclaire.
+
+   Technique : un `::after` en anneau d'un pixel, dont le dégradé est
+   centré sur `--mx`/`--my` — les variables que la scène `projecteur`
+   de fx.js pose déjà, avec une seule écoute déléguée pour tout le site.
+   Le masque en `exclude` évide le centre : seul le contour reste peint.
+
+   `::before` est déjà pris sur ces deux familles (la lueur intérieure,
+   premium.css) ; `::after` était libre.
+
+   CE QUI N'EST PAS REPRIS DU MOTIF, ET POURQUOI : le magnétisme, où la
+   carte dérive vers le curseur. Les deux familles portent déjà un
+   `:hover{transform:translateY(-5px)}` en CSS, et GSAP écrit ses
+   transformations en style INLINE — le magnétisme écraserait le
+   soulèvement à la première frame. C'est le piège que premium.css
+   documente à propos des acteurs du héros. On ne met pas deux moteurs
+   sur le même canal.
+   ============================================================ */
+@supports ((-webkit-mask-composite: xor) or (mask-composite: exclude)){
+  @media (hover:hover) and (pointer:fine){
+    .kpc::after,.whyv-card::after{
+      content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+      border-radius:inherit;padding:1px;
+      background:radial-gradient(9rem 9rem at var(--mx,50%) var(--my,50%),
+        rgba(255,255,255,.62),rgba(255,255,255,.06) 55%,transparent 72%);
+      -webkit-mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);
+      -webkit-mask-composite:xor;
+      mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);
+      mask-composite:exclude;
+      opacity:0;transition:opacity .42s var(--ease-out)}
+    .kpc:hover::after,.whyv-card:hover::after{opacity:1}
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  .kpc::after,.whyv-card::after{transition:none}
+}

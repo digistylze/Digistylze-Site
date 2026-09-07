@@ -1,0 +1,339 @@
+/* ================================================================
+   DIGISTYLZE — VIZ : les graphiques du site
+   ================================================================
+   POURQUOI CE FICHIER EXISTE
+
+   Le site savait déjà dessiner de la donnée, mais chaque page redessinait
+   la même chose sous un autre nom. Au 2026-08-05 :
+
+     · le même mini-tableau de bord à barres existait quatre fois —
+       `.res-mockdash` (accueil), `.mockdash` (réalisations), `.rdash`
+       (Google Ads), `.rcase__mock` (Meta Ads) ;
+     · le faux résultat de recherche Google était recopié mot pour mot dans
+       trois `<style>` inline — agence-seo, agence-google-ads,
+       publicite-en-ligne ;
+     · six pages n'avaient qu'une seule vraie image, et pas un graphique.
+
+   Un composant recopié quatre fois n'est pas un composant : c'est quatre
+   composants qui divergeront. Ce fichier les rassemble et complète la série
+   avec ce qui manquait — répartition, jauge, frise, comparateur.
+
+   LA RÈGLE D'HONNÊTETÉ
+   Toute brique qui met en scène un chiffre porte l'étiquette `.stamp`
+   (« illustration », définie dans site.css). Ce n'est pas une décoration :
+   c'est ce qui distingue une capture d'écran d'un dessin. Les valeurs
+   viennent de `figures-validees.md`, jamais d'ailleurs.
+
+   L'ANIMATION NE MASQUE JAMAIS RIEN
+   Chaque brique est dessinée à son état FINAL en CSS pur. L'animation
+   n'existe que sous `@supports (animation-timeline: view())` et seulement
+   hors `prefers-reduced-motion`. Si le navigateur ne sait pas, si le JS ne
+   charge pas, si la CSP bloque : le graphique est là, complet, lisible.
+   C'est la règle n°1 du BUILD-GUIDE, appliquée sans exception.
+
+   Points de rupture : 1120 / 960 / 860 / 720 / 640 / 520, et rien d'autre.
+   ================================================================ */
+
+/* ============================================================
+   LE CADRE — commun à toutes les briques
+   ============================================================ */
+.viz,.viz-dash,.viz-serp,.viz-seg,.viz-step,.viz-gauge,.viz-bars{
+  --viz-accent:var(--dz-accent,var(--fg));
+  --viz-grad:var(--dz-accent-grad,var(--fg));
+  /* Le jaune du domaine « sunshine » est le seul dégradé du site sur lequel
+     du blanc devient illisible. Le site connaît déjà ce cas (la pilule de
+     filtre des ressources bascule en `--fg` pour la même raison). */
+  --viz-on-grad:#fff}
+.dom-sunshine{--viz-on-grad:var(--fg)}
+.viz{
+  background:var(--bg);border:1px solid var(--line);
+  border-radius:var(--radius-lg);padding:clamp(1rem,2.2vw,1.4rem)}
+.viz--flat{background:none;border:0;border-radius:0;padding:0}
+.viz--raised{box-shadow:var(--shadow-lg)}
+.viz--night{background:var(--night);border-color:rgba(255,255,255,.12);color:var(--night-fg)}
+.viz--night .viz__label,.viz--night .viz__note{color:var(--night-muted)}
+.viz--night .viz__rule{background:rgba(255,255,255,.14)}
+
+.viz__head{display:flex;align-items:baseline;justify-content:space-between;
+  gap:.8rem;flex-wrap:wrap;margin-bottom:.9rem}
+.viz__label{font-size:.62rem;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted)}
+.viz__foot{margin-top:.8rem;display:flex;align-items:center;
+  justify-content:space-between;gap:.8rem;flex-wrap:wrap}
+.viz__note{font-size:.72rem;color:var(--muted);font-weight:400}
+.viz__rule{height:1px;background:var(--line);border:0;margin:.8rem 0}
+
+/* ============================================================
+   VIZ-BARS — l'histogramme
+   ------------------------------------------------------------
+   Remplace .res-mockdash, .mockdash, .rdash et .rcase__mock.
+   Chaque barre porte sa hauteur en `--h` (un pourcentage) et son libellé
+   en `data-lab`. La dernière barre peut porter `data-peak` pour se colorer
+   du dégradé de domaine : c'est le mois qui porte le message.
+   ============================================================ */
+.viz-bars{display:flex;align-items:flex-end;gap:clamp(.25rem,1vw,.5rem);
+  height:clamp(5rem,14vw,9rem);position:relative}
+/* Une graduation, une seule, à mi-hauteur. Deux filets font un quadrillage,
+   et un quadrillage sur sept barres est du bruit. */
+.viz-bars::before{content:"";position:absolute;left:0;right:0;top:50%;
+  border-top:1px dashed var(--line);pointer-events:none}
+.viz-bar{flex:1;min-width:0;position:relative;
+  height:var(--h,40%);border-radius:.22rem .22rem 0 0;
+  background:var(--line);transform-origin:bottom}
+.viz-bar[data-peak]{background:var(--viz-grad)}
+.viz-bar[data-lab]::after{content:attr(data-lab);position:absolute;
+  left:50%;transform:translateX(-50%);top:calc(100% + .35rem);
+  font-size:.56rem;color:var(--muted);white-space:nowrap}
+.viz-bars[data-lab] {margin-bottom:1.1rem}
+.viz--night .viz-bar{background:rgba(255,255,255,.16)}
+
+/* ============================================================
+   VIZ-LINE — la courbe
+   ------------------------------------------------------------
+   Le tracé se dessine au défilement. `pathLength="1"` normalise la
+   longueur : le même CSS anime n'importe quelle courbe sans que le JS ait
+   à mesurer quoi que ce soit avec getTotalLength().
+   ============================================================ */
+.viz-line{display:block;width:100%;height:auto}
+/* `non-scaling-stroke` : sans lui, le trait grossit avec le viewBox — 2px
+   dessinés dans une grille de 320 deviennent 7px à 1200 de large, et la
+   courbe passe de fine à grasse selon la colonne où on la pose.
+   ------------------------------------------------------------
+   MAIS il casse `pathLength`. Avec `non-scaling-stroke`, le moteur calcule
+   les tirets dans l'espace RENDU sans réappliquer le rapport de pathLength :
+   `stroke-dasharray:1` ne couvrait donc plus toute la courbe mais 1/échelle
+   d'entre elle. Mesuré sur la page SEO : SVG de 300 unités rendu à 499 px,
+   échelle 1,66, courbe dessinée à 60 % — elle s'arrêtait en l'air, avant son
+   propre point final, et rien dans l'animation ne pouvait la rattraper.
+   La longueur du tiret est donc posée en pixels par viz.js, qui mesure. Sans
+   ce script, `--viz-dash` n'existe pas, le repli est `none` : pas de tiret,
+   pas d'animation, la courbe est pleine. La panne reste impossible. */
+.viz-line .viz-line__path{fill:none;stroke:var(--viz-accent);stroke-width:2;
+  vector-effect:non-scaling-stroke;
+  stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:var(--viz-dash,none);stroke-dashoffset:0}
+.viz-line .viz-line__area{fill:var(--viz-accent);opacity:.08}
+.viz-line .viz-line__grid{stroke:var(--line);stroke-width:1;
+  vector-effect:non-scaling-stroke;stroke-dasharray:3 4}
+.viz-line .viz-line__dot{fill:var(--viz-accent)}
+
+/* ============================================================
+   VIZ-SEG — la part du tout
+   ------------------------------------------------------------
+   Une barre découpée en segments dont la largeur EST la part. La largeur
+   vient de `flex-grow:var(--part)` : la part dessinée et la part écrite ne
+   peuvent pas diverger, puisqu'elles sortent du même nombre.
+   À n'utiliser que pour une répartition qui fait cent.
+   ============================================================ */
+.viz-seg{display:flex;gap:3px;height:clamp(2.2rem,5vw,3rem);
+  border-radius:.25rem;overflow:hidden}
+.viz-seg__part{flex:var(--part,1) 1 0;min-width:0;position:relative;
+  background:var(--line);display:flex;align-items:flex-start;
+  padding:.45rem .55rem;overflow:hidden}
+/* La part principale porte le dégradé du domaine ; les suivantes descendent
+   une rampe d'encre. Trois gris voisins ne se distinguent pas — c'est
+   l'écart de valeur qui fait lire la répartition, pas la teinte. */
+.viz-seg__part:first-child{background:var(--viz-grad)}
+.viz-seg__part:nth-child(2){background:color-mix(in srgb,var(--fg) 26%,var(--bg))}
+.viz-seg__part:nth-child(3){background:color-mix(in srgb,var(--fg) 14%,var(--bg))}
+.viz-seg__part:nth-child(4){background:color-mix(in srgb,var(--fg) 7%,var(--bg))}
+.viz-seg__pct{font-size:.62rem;font-weight:600;color:var(--fg);
+  white-space:nowrap;line-height:1}
+.viz-seg__part:first-child .viz-seg__pct{color:var(--viz-on-grad,#fff)}
+.viz-seg__part:nth-child(2) .viz-seg__pct{color:#fff}
+/* Le rack de libellés vit sous la barre, relié par un filet de rappel :
+   une petite part reste lisible sans qu'on réduise sa typographie. */
+.viz-seg-rack{display:flex;gap:3px;margin-top:.5rem}
+.viz-seg-rack__item{flex:var(--part,1) 1 0;min-width:0;padding-top:.5rem;
+  border-top:1px solid var(--line);font-size:.7rem;line-height:1.35}
+.viz-seg-rack__item b{display:block;font-weight:600}
+.viz-seg-rack__item span{color:var(--muted);font-weight:400}
+
+/* ============================================================
+   VIZ-GAUGE — la jauge annulaire
+   ------------------------------------------------------------
+   `--val` de 0 à 100. L'anneau est un cercle SVG de circonférence
+   normalisée à 100 par `pathLength`, donc `stroke-dasharray:var(--val) 100`
+   se lit littéralement « var(--val) pour cent ».
+   ============================================================ */
+.viz-gauge{display:grid;place-items:center;position:relative;
+  width:clamp(6rem,14vw,8.5rem);aspect-ratio:1}
+.viz-gauge svg{width:100%;height:100%;transform:rotate(-90deg)}
+.viz-gauge__track{fill:none;stroke:var(--line);stroke-width:8}
+.viz-gauge__fill{fill:none;stroke:var(--viz-accent);stroke-width:8;
+  stroke-linecap:round;stroke-dasharray:var(--val,50) 100}
+.viz-gauge__val{position:absolute;text-align:center;line-height:1.05}
+.viz-gauge__val b{display:block;font-size:clamp(1.1rem,2.6vw,1.5rem);
+  font-weight:600;letter-spacing:-.02em}
+.viz-gauge__val span{font-size:.6rem;color:var(--muted);font-weight:400}
+
+/* ============================================================
+   VIZ-STEP — la frise qui se remplit à la lecture
+   ------------------------------------------------------------
+   Un rail vertical dont la partie encrée suit le défilement. Les étapes
+   sont numérotées par un compteur CSS : ajouter une étape ne demande pas
+   de renuméroter le HTML.
+   ============================================================ */
+.viz-step{counter-reset:vizstep;position:relative;padding-left:2.6rem}
+.viz-step::before{content:"";position:absolute;left:.85rem;top:.4rem;bottom:.4rem;
+  width:2px;background:var(--line)}
+.viz-step__rail{position:absolute;left:.85rem;top:.4rem;width:2px;
+  height:100%;transform-origin:top;background:var(--viz-grad)}
+.viz-step__item{position:relative;padding-bottom:clamp(1.4rem,3vw,2.2rem)}
+.viz-step__item:last-child{padding-bottom:0}
+.viz-step__item::before{counter-increment:vizstep;content:counter(vizstep,decimal-leading-zero);
+  position:absolute;left:-2.6rem;top:0;width:1.7rem;height:1.7rem;
+  display:grid;place-items:center;border-radius:50%;
+  background:var(--bg);border:1px solid var(--line);
+  font-size:.6rem;font-weight:600;color:var(--muted)}
+.viz-step__item h3{font-size:1rem;font-weight:600;letter-spacing:-.01em}
+.viz-step__item p{margin-top:.3rem;font-size:.92rem;font-weight:400;
+  line-height:1.55;color:var(--fg-soft);max-width:var(--measure)}
+.viz-step__when{font-size:.66rem;font-weight:600;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--viz-accent)}
+
+/* ============================================================
+   VIZ-AB — le comparateur avant / après
+   ------------------------------------------------------------
+   Deux images côte à côte, légendées. C'est la forme par défaut, et pour
+   des visuels portrait — un feed Instagram en 4/5 — c'est aussi la bonne :
+   superposées sous un curseur, elles donnent un bloc de 1400px de haut
+   qu'on ne peut pas embrasser du regard.
+
+   Le curseur ne s'active que si l'auteur écrit `data-viz-ab="curseur"`. Il
+   convient aux visuels larges, où l'œil compare un même point de l'image.
+   Le JS ajoute alors `.is-live` — absent, on garde le côte à côte, qui n'a
+   rien perdu.
+   ============================================================ */
+.viz-ab{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+.viz-ab figure{position:relative;margin:0;border-radius:.7rem;overflow:hidden;
+  border:1px solid var(--line)}
+.viz-ab img{width:100%;display:block;object-fit:cover;aspect-ratio:4/5}
+.viz-ab figcaption{position:absolute;top:.6rem;left:.6rem;
+  font-size:.6rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  background:rgba(255,255,255,.94);color:var(--fg);
+  padding:.25rem .6rem;border-radius:var(--radius-pill)}
+.viz-ab.is-live{display:block;position:relative;border-radius:.7rem;
+  overflow:hidden;border:1px solid var(--line);cursor:ew-resize;touch-action:none;
+  /* La hauteur est bornée : superposées, deux images portrait donneraient
+     un bloc plus haut que l'écran, et on ne compare bien que ce qu'on voit
+     d'un coup d'œil. Les images recadrent au lieu de pousser le bloc. */
+  aspect-ratio:16/10;max-height:min(70vh,32rem)}
+.viz-ab.is-live figure{position:absolute;inset:0;border:0;border-radius:0}
+.viz-ab.is-live img{width:100%;height:100%;aspect-ratio:auto;object-fit:cover}
+.viz-ab.is-live figure:last-child{clip-path:inset(0 0 0 var(--split,50%))}
+.viz-ab.is-live figure:last-child figcaption{left:auto;right:.6rem}
+.viz-ab__handle{position:absolute;top:0;bottom:0;left:var(--split,50%);
+  width:2px;background:#fff;box-shadow:0 0 0 1px rgba(20,20,24,.18);
+  pointer-events:none}
+.viz-ab__handle::after{content:"";position:absolute;top:50%;left:50%;
+  width:2.1rem;height:2.1rem;transform:translate(-50%,-50%);
+  border-radius:50%;background:#fff;box-shadow:var(--shadow-md)}
+
+/* ============================================================
+   VIZ-DASH — le tableau de bord
+   ------------------------------------------------------------
+   Le cadre d'interface : une barre de titre, des tuiles d'indicateurs,
+   puis un emplacement pour un graphique — le plus souvent .viz-bars.
+   ============================================================ */
+.viz-dash{border-radius:var(--radius-lg);overflow:hidden;
+  border:1px solid var(--line);background:var(--bg);box-shadow:var(--shadow-lg)}
+.viz-dash__bar{display:flex;align-items:center;gap:.5rem;
+  padding:.6rem .9rem;background:var(--canvas);border-bottom:1px solid var(--line-soft)}
+.viz-dash__bar i{width:.5rem;height:.5rem;border-radius:50%;background:var(--line)}
+.viz-dash__bar span{margin-left:.4rem;font-size:.62rem;font-weight:500;color:var(--muted)}
+.viz-dash__body{padding:clamp(.9rem,2.2vw,1.3rem)}
+.viz-dash__kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:.7rem;margin-bottom:1rem}
+.viz-kpi{border:1px solid var(--line);border-radius:.6rem;padding:.7rem .8rem}
+.viz-kpi__lab{font-size:.56rem;font-weight:600;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--muted)}
+.viz-kpi__val{margin-top:.25rem;font-size:clamp(1rem,2.4vw,1.35rem);
+  font-weight:600;letter-spacing:-.025em;line-height:1.1}
+.viz-kpi__delta{font-size:.66rem;font-weight:600;color:var(--success)}
+.viz-kpi__delta[data-dir="bas"]{color:var(--mint-text)}
+/* La provenance d'un indicateur n'est pas une bonne nouvelle : elle se
+   compose en gris. Le vert est réservé à ce qui progresse. */
+.viz-kpi__src{font-size:.6rem;font-weight:500;color:var(--muted)}
+.viz--night .viz-dash,.viz-dash--night{background:var(--night);border-color:rgba(255,255,255,.12);
+  color:var(--night-fg)}
+.viz-dash--night .viz-dash__bar{background:rgba(255,255,255,.05);
+  border-bottom-color:rgba(255,255,255,.1)}
+.viz-dash--night .viz-kpi{border-color:rgba(255,255,255,.14)}
+.viz-dash--night .viz-kpi__lab{color:var(--night-muted)}
+@media (max-width:520px){
+  .viz-dash__kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+/* ============================================================
+   VIZ-SERP — le résultat de recherche
+   ------------------------------------------------------------
+   Fusion des trois copies. Le résultat mis en avant porte `data-rank`,
+   les concurrents sont estompés — c'est la seule hiérarchie du composant,
+   et elle suffit : on lit « qui est premier » sans légende.
+   ============================================================ */
+.viz-serp{background:var(--bg);border:1px solid var(--line);
+  border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);
+  padding:clamp(.9rem,2.2vw,1.3rem)}
+.viz-serp__field{display:flex;align-items:center;gap:.6rem;
+  border:1px solid var(--line);border-radius:var(--radius-pill);
+  padding:.65rem 1rem;margin-bottom:.9rem}
+.viz-serp__field svg{width:1rem;height:1rem;flex:none;
+  fill:none;stroke:var(--muted);stroke-width:2}
+.viz-serp__field span{font-size:.9rem;color:var(--fg-soft);font-weight:400}
+.viz-serp__hit{border:1px solid transparent;border-radius:.7rem;
+  padding:.7rem .85rem;position:relative}
+.viz-serp__hit + .viz-serp__hit{margin-top:.25rem}
+.viz-serp__hit[data-rank]{border-color:var(--line);
+  background:linear-gradient(180deg,var(--canvas),var(--bg))}
+.viz-serp__hit[data-rank]::before{content:"";position:absolute;
+  left:0;top:.7rem;bottom:.7rem;width:3px;border-radius:3px;background:var(--viz-grad)}
+.viz-serp__hit[data-rank]::after{content:"#" attr(data-rank);position:absolute;
+  top:.6rem;right:.7rem;font-size:.58rem;font-weight:600;color:#fff;
+  background:var(--viz-grad);border-radius:var(--radius-pill);padding:.15rem .5rem}
+.viz-serp__url{font-size:.72rem;color:var(--muted);font-weight:400}
+.viz-serp__title{font-size:.95rem;font-weight:600;color:var(--fg);margin-top:.1rem}
+.viz-serp__hit[data-rank] .viz-serp__title{color:var(--viz-accent)}
+.viz-serp__desc{font-size:.82rem;color:var(--fg-soft);font-weight:400;
+  line-height:1.45;margin-top:.15rem}
+.viz-serp__hit:not([data-rank]){opacity:.55}
+
+/* ============================================================
+   L'ANIMATION — liée au défilement, native, sans une ligne de JS
+   ------------------------------------------------------------
+   Tout ce qui précède décrit l'état FINAL. Ce qui suit ne s'applique que
+   si le navigateur sait animer au défilement ET si l'utilisateur n'a pas
+   demandé moins de mouvement. Aucun état de départ ne masque quoi que ce
+   soit en dehors de ce bloc : c'est ce qui rend la panne impossible.
+   ============================================================ */
+@supports (animation-timeline: view()){
+  @media (prefers-reduced-motion: no-preference){
+    .viz-bar{animation:vizPousse linear both;
+      animation-timeline:view();animation-range:entry 15% cover 40%}
+    .viz-line__path{animation:vizTrace linear both;
+      animation-timeline:view();animation-range:entry 20% cover 50%}
+    .viz-line__dot{animation:vizPoint linear both;
+      animation-timeline:view();animation-range:cover 40% cover 55%}
+    .viz-seg__part{animation:vizEtale linear both;
+      animation-timeline:view();animation-range:entry 15% cover 40%}
+    .viz-gauge__fill{animation:vizRemplit linear both;
+      animation-timeline:view();animation-range:entry 20% cover 45%}
+    /* La frise se remplit sur toute la traversée de la section : c'est le
+       seul effet du lot qui suit la lecture plutôt que l'entrée. */
+    .viz-step__rail{animation:vizMonte linear both;
+      animation-timeline:view();animation-range:entry 40% exit 40%}
+  }
+}
+@keyframes vizPousse{from{height:0}to{height:var(--h,40%)}}
+@keyframes vizTrace{from{stroke-dashoffset:var(--viz-dash,0)}to{stroke-dashoffset:0}}
+@keyframes vizPoint{from{opacity:0}to{opacity:1}}
+@keyframes vizEtale{from{flex-grow:.001}to{flex-grow:var(--part,1)}}
+@keyframes vizRemplit{from{stroke-dasharray:0 100}to{stroke-dasharray:var(--val,50) 100}}
+@keyframes vizMonte{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+
+/* Sans animation liée au défilement, le rail de la frise est plein : il
+   dit « voici le parcours », pas « voici où vous en êtes ». C'est moins
+   vivant, ce n'est pas moins juste. */
+@supports not (animation-timeline: view()){
+  .viz-step__rail{transform:scaleY(1)}
+}

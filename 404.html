@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Page introuvable | Digistylze</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="/assets/img/logo/mark-black.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Martian+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --nuit:#0B0C0F; --ink:#101114; --paper:#F6F4EC; --paper-dim:#B9BCC6;
+    --f-disp:"Kanit","Archivo",system-ui,sans-serif;
+    --f-mono:"Martian Mono",ui-monospace,monospace;
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  html,body{height:100%}
+  body{background:var(--nuit); color:var(--paper); font-family:var(--f-disp);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:24px; overflow-x:clip}
+  .logo{position:fixed; top:22px; left:26px; display:inline-flex}
+  .logo img{height:26px; width:auto; display:block}
+  .quatre{display:flex; align-items:center; justify-content:center;
+    gap:clamp(6px,2.4vw,22px); line-height:1; user-select:none}
+  .quatre b{font-weight:800; font-variation-settings:"wdth" 88;
+    font-size:clamp(96px,22vw,190px); letter-spacing:-.04em;
+    color:var(--paper); opacity:.92}
+  .globe{position:relative; width:clamp(110px,21vw,180px); aspect-ratio:1; flex:none}
+  .globe canvas{width:100%; height:100%; display:block; contain:layout paint size}
+  /* zero de secours si WebGL/module indisponible : un O dessine */
+  .globe::before{content:""; position:absolute; inset:6%; border-radius:50%;
+    border:clamp(10px,2.2vw,18px) solid var(--paper); opacity:.92; z-index:0}
+  .globe.vivant::before{display:none}
+  .eyebrow{margin-top:clamp(26px,4.5vh,44px); font-family:var(--f-mono);
+    font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--paper-dim)}
+  h1{margin-top:12px; font-weight:800; font-variation-settings:"wdth" 90;
+    letter-spacing:-.028em; font-size:clamp(30px,5.4vw,54px)}
+  p{margin:14px auto 0; max-width:52ch; font-family:"Archivo",system-ui,sans-serif;
+    font-size:clamp(14.5px,1.5vw,17px); line-height:1.6; color:var(--paper-dim);
+    text-wrap:balance}
+  .retour{display:inline-flex; align-items:center; gap:11px;
+    margin-top:clamp(26px,4.5vh,42px); padding:15px 26px; border-radius:999px;
+    background:var(--paper); color:var(--ink); text-decoration:none;
+    font-weight:700; font-size:14.5px; letter-spacing:-.01em;
+    transition:transform .2s ease, background-color .2s ease}
+  .retour:hover{transform:translateY(-2px); background:#fff}
+  .retour svg{width:17px; height:17px; fill:none; stroke:currentColor; stroke-width:2;
+    stroke-linecap:round; stroke-linejoin:round; transition:transform .2s ease}
+  .retour:hover svg{transform:translateX(-3px)}
+  @media (prefers-reduced-motion:reduce){
+    .retour, .retour svg{transition:none}
+  }
+</style>
+</head>
+<body>
+
+<a class="logo" href="/" aria-label="Digistylze, retour à l'accueil">
+  <img src="/assets/img/logo/logo-white.svg" alt="Digistylze"
+       onerror="this.onerror=null;this.src='/assets/img/logo/mark-black.svg';this.style.filter='invert(1)'">
+</a>
+
+<div class="quatre" aria-label="Erreur 404">
+  <b aria-hidden="true">4</b>
+  <span class="globe" id="globe" aria-hidden="true"><canvas id="globeCanvas"></canvas></span>
+  <b aria-hidden="true">4</b>
+</div>
+
+<p class="eyebrow">Erreur 404</p>
+<h1>Cette page s&rsquo;est perdue en orbite.</h1>
+<p>L&rsquo;adresse contient peut-&ecirc;tre une coquille, ou cette page n&rsquo;existe plus. Le reste du site, lui, tourne parfaitement.</p>
+
+<a class="retour" href="/">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+  Retour &agrave; l&rsquo;accueil
+</a>
+
+<script type="module">
+  /* Globe COBE (lib vendorisee en local) : le zero du 404 est la Terre,
+     Geneve marquee. Sans WebGL/modules, le O de secours en CSS reste. */
+  try{
+    const { default: createGlobe } = await import('/assets/js/cobe.js');
+    const cadre = document.getElementById('globe');
+    const canvas = document.getElementById('globeCanvas');
+    let largeur = cadre.offsetWidth, phi = 0;
+    addEventListener('resize', () => { largeur = cadre.offsetWidth; });
+    createGlobe(canvas, {
+      devicePixelRatio: 2,
+      width: largeur * 2,
+      height: largeur * 2,
+      /* memes reglages que le globe du hero SEO : carte en pointilles bien
+         visible (mapBrightness eleve), marqueurs sombres, halo creme doux */
+      phi: 0,
+      theta: 0.25,
+      dark: 0,
+      diffuse: 1.5,
+      mapSamples: 16000,
+      mapBrightness: 10,
+      baseColor: [1, 1, 1],
+      markerColor: [0.06, 0.07, 0.09],
+      glowColor: [0.94, 0.93, 0.91],
+      markers: [
+        { location: [46.2044, 6.1432], size: 0.055 },  /* Geneve */
+        { location: [46.5197, 6.6323], size: 0.03 },   /* Lausanne */
+        { location: [46.9481, 7.4474], size: 0.028 },  /* Berne */
+        { location: [47.3769, 8.5417], size: 0.03 }    /* Zurich */
+      ],
+      onRender(state){
+        phi += 0.005;
+        state.phi = phi;
+        state.width = largeur * 2;
+        state.height = largeur * 2;
+      }
+    });
+    cadre.classList.add('vivant');
+  }catch(e){ /* le O de secours reste affiche */ }
+</script>
+
+</body>
+</html>

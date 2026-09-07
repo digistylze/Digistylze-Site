@@ -1,0 +1,174 @@
+/* ================================================================
+   DIGISTYLZE — GABARIT GÉO
+   Composants propres aux 16 pages d'atterrissage SEO local.
+
+   Extrait le 2026-08-04 des <style> inline, où ces 63 lignes étaient
+   dupliquées 16 fois. Feuille séparée plutôt que fondue dans site.css :
+   modifier le gabarit géo doit rester l'édition d'UN fichier, sinon on
+   recrée le couplage qu'on vient de supprimer.
+
+   Chargée après site.css par les 16 pages géo uniquement.
+   La couleur du domaine arrive par --tt, posé en attribut sur <main>.
+   ================================================================ */
+
+.crumb{max-width:var(--maxw);margin:0 auto;padding:1rem var(--gutter) 0;display:flex;align-items:center;gap:.55rem;font-family:var(--font-mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.crumb a{transition:color .2s}
+.crumb a:hover{color:var(--fg)}
+.crumb .sep{opacity:.5}
+.crumb [aria-current]{color:var(--fg);font-weight:600}
+.ghero{background:var(--bg);padding:clamp(2.2rem,5vh,3.4rem) var(--gutter) clamp(2.6rem,6vw,3.8rem);text-align:center}
+.ghero__inner{max-width:47rem;margin:0 auto}
+.ghero h1{font-size:clamp(2.3rem,5.4vw,4.1rem);font-weight:900;letter-spacing:-.035em;line-height:1.02}
+.ghero__lede{margin:1.2rem auto 0;color:var(--muted);font-weight:300;font-size:clamp(1rem,1.6vw,1.125rem);line-height:1.65;max-width:41rem}
+.ghero__ctas{margin-top:1.7rem;display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap}
+.ghero__micro{margin-top:.9rem}
+.ghero__proof{margin-top:1rem;display:inline-flex;align-items:center;gap:.5rem;font-family:var(--font-mono);font-size:.76rem;color:var(--fg-soft)}
+.ghero__proof .star{color:#FDB830}
+.gank{background:var(--canvas);border-top:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft);padding:clamp(3rem,6vw,4.6rem) var(--gutter)}
+.gank__inner{max-width:var(--maxw);margin:0 auto;display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(2rem,5vw,4rem);align-items:center}
+.gank .eyebrow{display:inline-block;margin-bottom:.8rem;color:var(--tt,var(--muted))}
+.gank h2{font-size:clamp(1.6rem,3.2vw,2.3rem);font-weight:800;letter-spacing:-.025em;line-height:1.1}
+.gank__body>p{margin-top:.9rem;color:var(--fg-soft);font-weight:300;line-height:1.65}
+.gank__facts{margin-top:1.2rem;display:flex;flex-direction:column;gap:.6rem}
+.gank__facts li{display:flex;gap:.6rem;align-items:flex-start;font-size:.95rem;font-weight:300;color:var(--fg-soft);line-height:1.5}
+.gank__facts li b{font-weight:600;color:var(--fg)}
+.gank__facts svg{width:1.05rem;height:1.05rem;flex-shrink:0;margin-top:.22rem;fill:none;stroke:var(--tt,var(--fg));stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.gank__cap{margin-top:.7rem;text-align:center;font-family:var(--font-mono);font-size:.68rem;color:var(--muted)}
+.gsvc{background:var(--bg);padding:var(--section-y) var(--gutter)}
+.gsvc__inner{max-width:var(--maxw);margin:0 auto}
+.gsvc__grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.1rem}
+.gsvc-card{display:flex;flex-direction:column;gap:.7rem;background:var(--bg);border:1px solid var(--line);border-radius:1.1rem;padding:1.6rem;transition:transform .3s var(--ease-out),box-shadow .3s var(--ease-out)}
+@media (hover:hover) and (pointer:fine){.gsvc-card:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg)}}
+.gsvc-card--main{border-color:var(--fg)}
+.gsvc-card__chip{width:2.6rem;height:2.6rem;border-radius:.7rem;display:flex;align-items:center;justify-content:center;color:#fff}
+.gsvc-card__chip.t-sunshine{color:var(--fg)}
+.gsvc-card__chip svg{width:1.2rem;height:1.2rem;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.gsvc-card__tag{font-family:var(--font-mono);font-size:.6rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.gsvc-card h3{font-size:1.12rem;font-weight:600;letter-spacing:-.01em;line-height:1.25}
+.gsvc-card p{font-size:.92rem;color:var(--muted);font-weight:300;line-height:1.6;flex:1}
+.gsvc-card .arrow-link{font-size:.9rem}
+.gseo{background:var(--bg);padding:0 var(--gutter) var(--section-y)}
+.gseo__inner{max-width:50rem;margin:0 auto;border:1px solid var(--line);border-radius:var(--radius-lg);padding:clamp(1.8rem,4vw,2.8rem);background:var(--canvas)}
+.gseo .eyebrow{display:inline-block;margin-bottom:.7rem;color:var(--tt,var(--muted))}
+.gseo h2{font-size:clamp(1.4rem,2.8vw,1.9rem);font-weight:800;letter-spacing:-.02em;line-height:1.15}
+.gseo p{margin-top:.9rem;color:var(--fg-soft);font-weight:300;line-height:1.7}
+.gseo p a{font-weight:600;color:var(--fg);text-decoration:underline;text-underline-offset:3px}
+.gzone{background:var(--bg);padding:0 var(--gutter) var(--section-y);text-align:center}
+.gzone__inner{max-width:46rem;margin:0 auto}
+.gzone h2{font-size:clamp(1.3rem,2.6vw,1.7rem);font-weight:800;letter-spacing:-.02em}
+.gzone p{margin-top:.6rem;color:var(--muted);font-weight:300;font-size:.95rem;line-height:1.6}
+.gzone__list{margin-top:1.2rem;display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center}
+.gzone__list a,.gzone__list span{font-family:var(--font-mono);font-size:.72rem;font-weight:600;letter-spacing:.04em;border:1px solid var(--line);border-radius:99px;padding:.4rem .95rem;color:var(--fg-soft)}
+.gzone__list a{transition:border-color .2s,color .2s,background .2s}
+.gzone__list a:hover{border-color:var(--fg);color:var(--fg);background:var(--canvas)}
+.gproof{background:var(--night);color:var(--night-fg);padding:clamp(2.2rem,5vw,3.2rem) var(--gutter)}
+.gproof__inner{max-width:var(--maxw);margin:0 auto;display:flex;align-items:center;justify-content:center;gap:clamp(1.6rem,6vw,4.5rem);flex-wrap:wrap;text-align:center}
+.gproof__item b{display:block;font-size:clamp(1.5rem,3vw,2.1rem);font-weight:900;letter-spacing:-.03em;color:#fff;font-variant-numeric:tabular-nums}
+.gproof__item span{display:block;margin-top:.2rem;font-size:.82rem;color:var(--night-muted);font-weight:300}
+.gproof .star{color:#FDB830}
+@media (max-width:860px){
+  .gank__inner{grid-template-columns:1fr}
+  .gsvc__grid{grid-template-columns:1fr;max-width:26rem;margin:0 auto}
+}
+/* ================================================================
+   QUATRE VARIANTES DE GABARIT
+
+   Les 16 pages géo partageaient une séquence de sections strictement
+   identique : même hero centré, même ancrage, même trio de services,
+   même bandeau de preuves. Vues l'une après l'autre — et un visiteur
+   qui arrive par « agence SEO Genève » puis « agence SEO Lausanne »
+   les voit bien l'une après l'autre — elles se lisaient comme un
+   gabarit rempli.
+
+   La variante se choisit par une classe sur <body> : gv-a…gv-d.
+   Elle ne touche NI au DOM, NI à l'ordre de lecture, NI au contenu :
+   même H1, mêmes H2, même copy locale, même FAQPage en JSON-LD, mêmes
+   liens internes. Seule la composition change. C'est ce qui la rend
+   sûre à appliquer sur seize pages d'un coup.
+   ================================================================ */
+
+/* ── A · DOSSIER — texte d'abord, hero sans image, preuve tardive ── */
+.gv-a .ghero{text-align:left;padding-bottom:clamp(1.8rem,4vw,2.6rem)}
+.gv-a .ghero__inner{max-width:var(--maxw)}
+.gv-a .ghero h1{max-width:16ch}
+.gv-a .ghero__lede{margin-left:0;max-width:46rem}
+.gv-a .ghero__ctas{justify-content:flex-start}
+.gv-a .ghero__inner::after{content:"";display:block;width:5rem;height:1px;
+  background:var(--line);margin-top:1.6rem}
+/* L'ancrage devient une lecture éditoriale : le visuel passe à gauche,
+   plus étroit, et le texte respire sur la colonne large. */
+.gv-a .gank__inner{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);direction:rtl}
+.gv-a .gank__inner > *{direction:ltr}
+.gv-a .gproof{background:var(--canvas);color:var(--fg);
+  border-top:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft)}
+.gv-a .gproof__item b{color:var(--fg)}
+.gv-a .gproof__item span{color:var(--muted)}
+
+/* ── B · VITRINE — image d'abord, hero sur fond sombre ── */
+.gv-b .ghero{background:var(--night);color:var(--night-fg)}
+.gv-b .ghero h1{color:#fff}
+.gv-b .ghero__lede{color:var(--night-muted)}
+.gv-b .ghero__proof{color:rgba(255,255,255,.8)}
+.gv-b .ghero .btn-ghost{border-color:rgba(255,255,255,.3);color:#fff}
+.gv-b .ghero .btn-ghost:hover{border-color:#fff;background:rgba(255,255,255,.08)}
+.gv-b .ghero .btn-pill{background:#fff;color:var(--fg)}
+.gv-b .ghero .btn-pill::before{background:var(--fg)}
+.gv-b .ghero .btn-pill:hover{color:#fff}
+.gv-b .ghero .microcopy{color:var(--night-muted)}
+/* Les services en bento asymétrique : la première carte occupe deux
+   colonnes, ce qui casse le trio d'égales. */
+.gv-b .gsvc__grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.gv-b .gsvc-card:first-child{grid-column:span 2}
+.gv-b .gsvc-card:nth-child(2),.gv-b .gsvc-card:nth-child(3){grid-column:span 2}
+.gv-b .gank{background:var(--bg)}
+
+/* ── C · FICHE TECHNIQUE — tout est mesurable, registre tabulaire ── */
+.gv-c .ghero{background:var(--canvas);text-align:left;
+  border-bottom:1px solid var(--line-soft)}
+.gv-c .ghero__inner{max-width:var(--maxw)}
+.gv-c .ghero__lede{margin-left:0}
+.gv-c .ghero__ctas{justify-content:flex-start}
+/* Les services deviennent des lignes indexées, pas des cartes. */
+.gv-c .gsvc__grid{grid-template-columns:minmax(0,1fr);gap:0}
+.gv-c .gsvc-card{flex-direction:row;align-items:flex-start;gap:1.2rem;
+  border:0;border-top:1px solid var(--line);border-radius:0;
+  padding:1.4rem 0;transition:background .3s var(--ease)}
+.gv-c .gsvc-card:last-child{border-bottom:1px solid var(--line)}
+.gv-c .gsvc-card--main{border-color:var(--line)}
+@media (hover:hover) and (pointer:fine){
+  .gv-c .gsvc-card:hover{transform:none;box-shadow:none;background:var(--canvas)}
+}
+.gv-c .gsvc-card__chip{flex-shrink:0}
+.gv-c .gsvc-card__tag{position:absolute;left:-9999px}
+.gv-c .gsvc-card h3{font-size:1.25rem}
+/* La carte en ligne place le contenu dans un enfant implicite : sans
+   min-width:0 il garde la largeur min-content du lien fléché, qui ne se coupe
+   pas, et c'est la page qui déborde. */
+.gv-c .gsvc-card > *{min-width:0}
+.gv-c .gsvc-card .arrow-link{max-width:100%}
+.gv-c .gproof__item b{font-family:var(--font-mono)}
+
+/* ── D · CONVERSATION — humain, sans arête, tout en rondeur ── */
+.gv-d .ghero{padding-bottom:clamp(2rem,4vw,3rem)}
+.gv-d .ghero h1{font-size:clamp(2.1rem,4.6vw,3.4rem);max-width:18ch;margin:0 auto}
+.gv-d .gank{background:var(--bg);border:0}
+.gv-d .gank__inner{grid-template-columns:minmax(0,1fr);max-width:46rem;text-align:left}
+.gv-d .gank__visual{max-width:32rem;margin:0 auto}
+/* Le bloc éditorial se lit comme une réponse : filet à gauche, pas de cadre. */
+.gv-d .gseo__inner{background:none;border:0;border-left:2px solid var(--fg);
+  border-radius:0;padding:.2rem 0 .2rem 1.4rem;max-width:44rem}
+.gv-d .gzone__list a,.gv-d .gzone__list span{border-radius:.45rem}
+.gv-d .gproof__inner{gap:clamp(1.2rem,4vw,3rem)}
+
+@media (max-width:860px){
+  /* Toutes les variantes retombent sur la même colonne unique : à cette
+     largeur, la composition ne différencie plus rien, et la lisibilité
+     prime sur la variété. */
+  .gv-a .gank__inner,.gv-b .gsvc__grid,.gv-c .gsvc__grid{grid-template-columns:minmax(0,1fr)}
+  .gv-a .gank__inner{direction:ltr}
+  /* La carte en ligne redevient une carte en colonne : à 320px, la pastille
+     et le texte côte à côte ne laissent plus la place au lien fléché. */
+  .gv-c .gsvc-card{flex-direction:column;gap:.7rem}
+  .gv-b .gsvc-card:first-child,.gv-b .gsvc-card:nth-child(2),
+  .gv-b .gsvc-card:nth-child(3){grid-column:span 1}
+}

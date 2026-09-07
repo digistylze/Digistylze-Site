@@ -1,0 +1,655 @@
+/* ================================================================
+   DIGISTYLZE — PREMIUM-PAGES.CSS · extension refonte 2026-08-07
+   ================================================================
+   Couche premium des PAGES CŒUR AUTRES que index.html et
+   creation-site-web.html (ces deux-là chargent premium.css ; les
+   deux fichiers ne cohabitent JAMAIS, comme motion.js / fx.js).
+   Chargée APRÈS le <style> de page : à spécificité égale, elle
+   gagne la cascade.
+
+   Elle reprend le LANGAGE validé sur les deux pages refondues :
+   fondations fx (états de départ derrière html.wf-js.has-fx —
+   sans GSAP rien n'est masqué), panneaux nuit à lueurs BLANCHES
+   et grain, cartes de verre, grille de chiffres. Règle couleurs :
+   NOIR et BLANC uniquement ici — les couleurs secondaires ne
+   sortent jamais de leur service et restent dans les pages.
+
+   Le rail est respecté : aucune largeur en dur, gouttières aux
+   sections. Points de rupture : canon 520/640/720/860/960/1120.
+   ================================================================ */
+
+/* Le fondu de bas d'écran (2026-08-14, demande client — jumelle du
+   bloc 2z de premium.css, même raison, mêmes valeurs) : voile fixe
+   de flou progressif au ras du pli, deux couches masquées, aucun
+   clic volé. PAS dans site.css : les pages géo la chargeraient. */
+/* z50 : sous les .float-widget (z60) ; hauteurs augmentées le
+   2026-08-14 (retour client) — jumelle du bloc 2z de premium.css.
+   Desktop seulement (retour du même soir) : rien au doigt. */
+@media (min-width:861px){
+  body::before,body::after{content:'';position:fixed;left:0;right:0;bottom:0;
+    height:10rem;pointer-events:none;z-index:50;
+    backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+    -webkit-mask-image:linear-gradient(to bottom,transparent,#000 55%);
+            mask-image:linear-gradient(to bottom,transparent,#000 55%)}
+  body::after{height:5.5rem;
+    backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);
+    -webkit-mask-image:linear-gradient(to bottom,transparent,#000 75%);
+            mask-image:linear-gradient(to bottom,transparent,#000 75%)}
+}
+
+/* ============================================================
+   0 · FONDATIONS FX — grain, nappes, mots masqués, gardes
+   ============================================================ */
+.fx-stage{position:absolute;inset:0;overflow:clip;pointer-events:none;z-index:0}
+.fx-orb{position:absolute;border-radius:50%;filter:blur(60px);opacity:.55;
+  will-change:transform}
+.fx-orb--night-a{width:34rem;height:34rem;left:-9rem;top:-11rem;opacity:.4;
+  background:radial-gradient(closest-side,rgba(255,255,255,.4),transparent 65%)}
+.fx-orb--night-b{width:30rem;height:30rem;right:-8rem;top:16%;opacity:.35;
+  background:radial-gradient(closest-side,rgba(255,255,255,.32),transparent 65%)}
+.fx-grain{position:relative}
+.fx-grain::after{content:"";position:absolute;inset:0;pointer-events:none;
+  opacity:.038;mix-blend-mode:multiply;z-index:2;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* Mots masqués : le cadre rogne, l'intérieur glisse. Les décalages
+   de départ sont posés PAR fx.js — jamais par la CSS. */
+.fxw{display:inline-block;overflow:clip;vertical-align:bottom;
+  padding-bottom:.08em;margin-bottom:-.08em}
+.fxw__i{display:inline-block;will-change:transform}
+
+/* États de départ des acteurs chorégraphiés — derrière has-fx.
+   Fichier absent, CSP, reduced-motion : rien n'est masqué. */
+html.wf-js.has-fx .fx-hero-eyebrow{opacity:0;transform:translateY(18px)}
+html.wf-js.has-fx .fx-hero-sub{opacity:0;transform:translateY(26px);filter:blur(8px)}
+html.wf-js.has-fx .fx-hero-cta{opacity:0;transform:translateY(26px) scale(.94)}
+html.wf-js.has-fx .fx-hero-proof{opacity:0;transform:translateY(22px)}
+html.wf-js.has-fx .fx-hero-media{opacity:0;transform:translateY(60px) rotate(3.5deg) scale(.94)}
+html.wf-js.has-fx [data-fx]{opacity:0}
+html.has-fx [data-fx-marquee]{animation:none !important}
+
+/* ============================================================
+   1 · CTA — pilules rehaussées, identiques aux pages refondues.
+   ============================================================ */
+.btn-pill{padding:1.05rem 1.35rem 1.05rem 1.85rem;font-size:1rem;gap:.8rem;
+  box-shadow:0 10px 28px -12px rgba(20,20,24,.5),0 2px 6px -2px rgba(20,20,24,.3)}
+.btn-pill svg{width:2rem;height:2rem;flex:none;border-radius:50%;
+  background:rgba(255,255,255,.16);padding:.5rem;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18);
+  transition:transform .45s var(--ease-back),background .3s var(--ease-out)}
+.btn-pill:hover svg{transform:translate(3px,-2px) scale(1.06);
+  background:rgba(255,255,255,.26);color:var(--fg)}
+.btn-pill:hover{box-shadow:0 14px 34px -12px rgba(20,20,24,.55),
+  0 3px 8px -2px rgba(20,20,24,.3)}
+.btn-pill--sm{padding:.8rem 1.05rem .8rem 1.4rem;font-size:.92rem}
+.btn-pill--sm svg{width:1.7rem;height:1.7rem;padding:.42rem}
+.btn-ghost{border-width:1.5px;font-weight:600;
+  transition:transform .25s var(--ease-out),background .3s var(--ease-out),
+    color .3s var(--ease-out),border-color .3s var(--ease-out),
+    box-shadow .3s var(--ease-out)}
+.btn-ghost:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+
+/* ============================================================
+   2 · PANNEAU NUIT — l'écrin des moments forts : nuit, lueurs
+   BLANCHES, grain anti-banding. La section garde sa gouttière,
+   le panneau porte le décor.
+   ============================================================ */
+.nightp{position:relative;isolation:isolate;overflow:clip;
+  border-radius:2.2rem;color:var(--night-fg);
+  background:
+    radial-gradient(30rem 20rem at 12% 8%,rgba(255,255,255,.1),transparent 60%),
+    radial-gradient(36rem 24rem at 90% 92%,rgba(255,255,255,.07),transparent 64%),
+    linear-gradient(170deg,#17171D 0%,var(--night) 55%,#101016 100%);
+  padding:clamp(2.6rem,5.5vw,4.4rem) clamp(1.4rem,4vw,3.6rem);
+  box-shadow:0 40px 90px -50px rgba(14,14,18,.85)}
+.nightp::before{content:"";position:absolute;inset:0;pointer-events:none;
+  opacity:.05;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+.nightp > *{position:relative;z-index:1}
+.nightp .fx-stage{z-index:0}
+.nightp .eyebrow{color:var(--night-fg)}
+.nightp .eyebrow .picto{color:var(--night-fg)}
+.nightp h2,.nightp h3{color:var(--night-fg)}
+.nightp .section-head p{color:var(--night-muted)}
+.nightp__head{display:flex;flex-direction:column;align-items:center;
+  text-align:center;gap:.2rem;margin-bottom:clamp(1.6rem,3.2vw,2.6rem)}
+
+/* ============================================================
+   3 · QUATRE CARTES DE CHIFFRES — la grille validée : cartes de
+   verre égales, médaille de picto, grand chiffre BLANC, libellé.
+   Réveil en cascade (data-fx sur la carte) + contre-dérive par
+   siège (data-fx-par sur .kpg__seat) — jamais deux transforms
+   tweenés sur le même élément.
+   ============================================================ */
+.kpg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:clamp(.9rem,1.8vw,1.4rem);align-items:stretch}
+.kpg__seat{display:flex;min-width:0}
+.kpc{position:relative;isolation:isolate;overflow:clip;flex:1;
+  display:flex;flex-direction:column;align-items:flex-start;gap:.6rem;
+  border:1px solid rgba(255,255,255,.11);border-radius:1.5rem;
+  background:linear-gradient(160deg,rgba(255,255,255,.06),rgba(255,255,255,.016));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.09),
+    0 26px 60px -36px rgba(0,0,0,.85);
+  padding:clamp(1.3rem,2.2vw,1.8rem);
+  transition:transform .5s var(--ease-out),border-color .5s var(--ease-out)}
+.kpc:hover{transform:translateY(-5px);border-color:rgba(255,255,255,.24)}
+.kpc::before{content:"";position:absolute;inset:0;z-index:-1;
+  background:radial-gradient(13rem 10rem at var(--mx,50%) var(--my,50%),
+    rgba(255,255,255,.09),transparent 65%);
+  opacity:0;transition:opacity .4s var(--ease-out)}
+.kpc:hover::before{opacity:1}
+.kpc__ico{width:2.7rem;height:2.7rem;border-radius:.85rem;flex:none;
+  border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.06);
+  display:grid;place-items:center;color:var(--night-fg);
+  margin-bottom:auto;
+  transition:transform .5s var(--ease-back),background .4s var(--ease-out)}
+.kpc:hover .kpc__ico{transform:scale(1.08) rotate(-5deg);
+  background:rgba(255,255,255,.12)}
+.kpc__ico .picto-slot[data-picto]{margin:0;vertical-align:0;
+  display:inline-flex}
+.kpc__ico .picto{--picto-taille:1.25rem;color:var(--night-fg)}
+/* Enfant DIRECT seulement : l'étoile Google. Les pictos injectés
+   par picto.js vivent dans .picto-slot et gardent leur blanc. */
+.kpc__ico > svg{width:1.25rem;height:1.25rem;fill:#FDB830;
+  filter:drop-shadow(0 2px 6px rgba(253,184,48,.45))}
+.kpc > b{display:flex;align-items:baseline;gap:.3rem;
+  margin-top:clamp(1.6rem,3vw,2.4rem);
+  font-size:clamp(2.4rem,3.4vw,3.3rem);font-weight:700;line-height:1;
+  letter-spacing:-.03em;color:#fff}
+.kpc > b small{font-size:.42em;font-weight:700;color:var(--night-muted)}
+.kpc__lbl{color:var(--night-fg);font-size:.98rem;font-weight:600;
+  line-height:1.4}
+.kpc__note{color:var(--night-muted);font-size:.85rem;line-height:1.5}
+@media (max-width:960px){
+  .kpg{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:520px){
+  .kpg{grid-template-columns:1fr}
+  .kpc > b{margin-top:1.2rem}
+}
+
+/* ============================================================
+   4 · PICTOS CENTRÉS — médailles de cette couche.
+   ============================================================ */
+.kpc__ico{display:grid;place-items:center}
+.kpc__ico .picto-slot{margin:0;vertical-align:0;display:inline-flex}
+
+/* ============================================================
+   5 · TARIFS — LES OFFRES EN SCÈNE. Le hero texte-seul reçoit
+   sa scène : les trois offres réelles en cartes miniatures
+   posées en perspective miroir (poses vers le centre, data-pose
+   lu par fx.js), respiration au pointeur, entrée depuis la
+   profondeur (les .hf sont les acteurs du hero). NOIR et BLANC :
+   la page ne parle d'aucun service en particulier — l'offre
+   vitrine, mise en avant, passe simplement en nuit.
+   ============================================================ */
+/* Le hero quitte le gabarit colonne CENTRÉ : texte à gauche sur
+   le rail, la scène des offres à droite. */
+.tf-hero{text-align:left}
+.tf-hero__inner{display:grid;max-width:var(--maxw);
+  grid-template-columns:1.02fr .98fr;
+  gap:clamp(2rem,4.5vw,4rem);align-items:center}
+.tf-hero__sub{margin-left:0;margin-right:0}
+.tf-hero__cta{align-items:flex-start}
+/* Zigzag de profondeur : trois cartes empilées en quinconce —
+   aucun chevauchement possible par construction, la profondeur
+   vient des poses 3D et des ombres. */
+.tfh{display:flex;flex-direction:column;gap:clamp(.7rem,1.4vw,1rem);
+  align-items:flex-start}
+.tfh__seat--a{margin-left:0}
+.tfh__seat--b{align-self:center;margin-left:18%;z-index:2}
+.tfh__seat--c{align-self:flex-end;margin-right:0}
+.tfh-card{width:clamp(11.5rem,14vw,13.5rem);
+  display:flex;flex-direction:column;gap:.35rem;
+  background:var(--bg);border:1px solid var(--line);border-radius:1.2rem;
+  padding:1.15rem 1.2rem 1.25rem;
+  box-shadow:0 30px 70px -34px rgba(20,20,24,.5)}
+.tfh-card__k{font-size:.62rem;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted)}
+.tfh-card b{display:flex;align-items:baseline;gap:.3rem;
+  font-size:clamp(1.5rem,2vw,1.9rem);font-weight:700;letter-spacing:-.02em;
+  line-height:1;color:var(--fg)}
+.tfh-card b small{font-size:.5em;font-weight:600;color:var(--muted)}
+.tfh-card__note{font-size:.8rem;color:var(--muted);line-height:1.45}
+/* L'offre vitrine : la carte nuit du trio, badge blanc. */
+.tfh-card--night{width:clamp(11rem,14vw,13.5rem);position:relative;
+  background:linear-gradient(170deg,#1B1B22,#101015);
+  border-color:rgba(255,255,255,.14);color:var(--night-fg);
+  box-shadow:0 40px 90px -36px rgba(0,0,0,.75)}
+.tfh-card--night .tfh-card__k{color:var(--night-muted)}
+.tfh-card--night b{color:#fff}
+.tfh-card--night b small{color:var(--night-muted)}
+.tfh-card--night .tfh-card__note{color:var(--night-muted)}
+.tfh-card__pop{position:absolute;top:-.7rem;right:.9rem;
+  background:#fff;color:var(--fg);border-radius:99px;
+  padding:.24rem .7rem;font-size:.56rem;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;
+  box-shadow:0 8px 20px -8px rgba(0,0,0,.55)}
+@media (max-width:860px){
+  .tf-hero__inner{grid-template-columns:1fr}
+  .tfh{flex-direction:row;flex-wrap:wrap;gap:.8rem;margin-top:.6rem}
+  .tfh__seat--a,.tfh__seat--b,.tfh__seat--c{align-self:auto;margin:0;
+    flex:1 1 12rem;display:flex}
+  .tfh-card,.tfh-card--night{width:auto;flex:1}
+}
+
+/* ============================================================
+   6 · SAAS & APPLICATIONS — LE DASHBOARD RÉALISTE en hero.
+   Jumeau du .svd validé sur l'accueil (premium.css §40) — copié
+   ici car les deux feuilles ne cohabitent jamais ; le jour où
+   l'un bouge, l'autre suit. Les barres sont SKY : cette page
+   EST le service SaaS, la couleur est chez elle.
+   ============================================================ */
+/* Ce hero passe du gabarit colonne (52rem, centré) au RAIL :
+   la copy à gauche, la fenêtre d'app à droite. */
+.hero--appx .hero__inner{display:grid;max-width:var(--maxw);
+  grid-template-columns:1.02fr .98fr;
+  gap:clamp(2rem,4.5vw,4rem);align-items:center;text-align:left}
+.hero--appx .hero__copy{display:flex;flex-direction:column;
+  align-items:flex-start;text-align:left}
+.hero--appx .hero__ctas{justify-content:flex-start}
+.hero--appx .hero__title,.hero--appx .hero__sub{margin-inline:0;
+  max-width:none}
+.appx{perspective:1200px}
+.svd{position:relative;z-index:1;display:grid;
+  grid-template-columns:clamp(8.5rem,11vw,10.5rem) minmax(0,1fr);
+  border:1px solid rgba(255,255,255,.09);border-radius:1rem;
+  overflow:clip;background:linear-gradient(170deg,#16161C,#101015);
+  box-shadow:0 40px 90px -44px rgba(14,14,18,.65),
+    inset 0 1px 0 rgba(255,255,255,.07)}
+.svd__side{display:flex;flex-direction:column;gap:1rem;
+  padding:.95rem .75rem .85rem;background:rgba(255,255,255,.025);
+  border-right:1px solid rgba(255,255,255,.07)}
+.svd__logo{width:1.7rem;height:1.7rem;border-radius:.5rem;flex:none;
+  background:#fff}
+.svd__nav{display:flex;flex-direction:column;gap:.28rem}
+.svd__nav span{display:flex;align-items:center;gap:.5rem;
+  font-size:.64rem;font-weight:500;color:var(--night-muted);
+  padding:.42rem .55rem;border-radius:.5rem;white-space:nowrap}
+.svd__nav span i{flex:none;width:.72rem;height:.72rem;border-radius:.22rem;
+  border:1.5px solid rgba(255,255,255,.28)}
+.svd__nav span.is-on{background:rgba(255,255,255,.09);color:#fff}
+.svd__nav span.is-on i{border-color:rgba(255,255,255,.75);
+  background:rgba(255,255,255,.2)}
+.svd__user{margin-top:auto;display:flex;align-items:center;gap:.5rem}
+.svd__user i{flex:none;width:1.35rem;height:1.35rem;border-radius:50%;
+  background:rgba(255,255,255,.25)}
+.svd__user em{flex:1;height:.38rem;border-radius:99px;
+  background:rgba(255,255,255,.16)}
+.svd__main{display:flex;flex-direction:column;gap:.8rem;min-width:0;
+  padding:clamp(.85rem,1.5vw,1.15rem)}
+.svd__top{display:flex;align-items:center;gap:.7rem}
+.svd__top b{font-size:.82rem;font-weight:600;color:#fff;
+  letter-spacing:-.01em;margin-right:auto}
+.svd__range{font-size:.56rem;font-weight:600;color:var(--night-muted);
+  border:1px solid rgba(255,255,255,.14);border-radius:99px;
+  padding:.28rem .65rem;white-space:nowrap}
+.svd__avatar{width:1.5rem;height:1.5rem;border-radius:50%;flex:none;
+  background:rgba(255,255,255,.25)}
+.svd__kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:.55rem}
+.svd__kpi{border:1px solid rgba(255,255,255,.09);border-radius:.7rem;
+  background:rgba(255,255,255,.04);padding:.6rem .7rem;min-width:0}
+.svd__kpi span{display:flex;align-items:center;gap:.35rem;
+  font-size:.5rem;font-weight:600;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--night-muted);white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.svd__kpi b{display:block;margin-top:.3rem;font-size:1.02rem;
+  font-weight:700;letter-spacing:-.02em;color:#fff;line-height:1}
+.svd__kpi b small{font-size:.6em;font-weight:600;
+  color:var(--night-muted)}
+.svd__kpi--hot span::before{content:"";width:.42rem;height:.42rem;
+  flex:none;border-radius:50%;background:#fff}
+.svd__panel{border:1px solid rgba(255,255,255,.09);border-radius:.8rem;
+  background:rgba(255,255,255,.03);padding:.65rem .8rem .8rem}
+.svd__panel header{display:flex;align-items:center;
+  justify-content:space-between;margin-bottom:.6rem}
+.svd__panel b{font-size:.6rem;font-weight:600;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--night-muted)}
+.svd__dot{width:.5rem;height:.5rem;border-radius:50%;
+  background:var(--grad-sky)}
+.svd__bars{display:flex;align-items:flex-end;gap:.35rem;
+  height:clamp(3.6rem,6vw,5rem)}
+.svd__bars i{flex:1;border-radius:.25rem .25rem 0 0;
+  background:var(--grad-sky);height:var(--h,40%);opacity:.9}
+.svd__table{border:1px solid rgba(255,255,255,.09);border-radius:.8rem;
+  background:rgba(255,255,255,.03);overflow:clip}
+.svd__thead,.svd__tr{display:grid;
+  grid-template-columns:1.1fr 1fr auto .7fr;
+  align-items:center;gap:.7rem;padding:.5rem .8rem}
+.svd__thead{border-bottom:1px solid rgba(255,255,255,.08)}
+.svd__thead span{font-size:.5rem;font-weight:600;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--night-muted);white-space:nowrap}
+.svd__thead span:last-child{text-align:right}
+.svd__tr + .svd__tr{border-top:1px solid rgba(255,255,255,.05)}
+.svd__tr i{display:block;height:.38rem;border-radius:99px;
+  background:rgba(255,255,255,.14);width:var(--w,60%)}
+.svd__tr i:last-child{justify-self:end}
+.svd__pill{font-size:.52rem;font-weight:600;border-radius:99px;
+  padding:.2rem .55rem;white-space:nowrap;width:max-content}
+.svd__pill--ok{background:rgba(47,166,106,.18);color:#7FD6A4}
+.svd__pill--wip{background:rgba(255,255,255,.09);color:rgba(255,255,255,.72)}
+.svd__pill--ship{background:rgba(255,255,255,.16);color:#fff}
+@media (max-width:960px){
+  .hero--appx .hero__inner{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .svd{grid-template-columns:2.6rem minmax(0,1fr)}
+  .svd__side{padding:.75rem .45rem;align-items:center}
+  .svd__nav span{font-size:0;gap:0;justify-content:center;
+    padding:.42rem}
+  .svd__user em{display:none}
+  .svd__range{display:none}
+  .svd__kpis{grid-template-columns:1fr;gap:.45rem}
+  .svd__kpi{display:flex;align-items:center;
+    justify-content:space-between;gap:.6rem;padding:.5rem .7rem}
+  .svd__kpi b{margin-top:0}
+  .svd__thead,.svd__tr{grid-template-columns:1fr auto .7fr;gap:.5rem}
+  .svd__thead span:nth-child(2),.svd__tr i:nth-child(2){display:none}
+}
+
+/* ============================================================
+   7 · CONTACT — LE TERMINAL DE NUIT. Le formulaire reprend la
+   carte-terminal validée : verre sombre, liseré de lumière
+   BLANCHE qui orbite, champs lisibles, bouton blanc inversé.
+   Jumeau du .cta-form de premium.css §24 (jamais co-chargés).
+   ============================================================ */
+.nform{position:relative;overflow:clip;isolation:isolate;
+  background:linear-gradient(165deg,rgba(255,255,255,.075),rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.12);border-radius:1.8rem;
+  box-shadow:0 50px 100px -60px rgba(0,0,0,.9),
+    inset 0 1px 0 rgba(255,255,255,.1);
+  padding:clamp(1.6rem,3vw,2.4rem)}
+.nform::before{content:"";position:absolute;inset:-45%;z-index:-2;
+  background:conic-gradient(from 0deg,transparent 0 72%,rgba(255,255,255,.35) 84%,rgba(255,255,255,.65) 92%,transparent 100%);
+  animation:nformOrbit 7s linear infinite}
+.nform::after{content:"";position:absolute;inset:1.5px;z-index:-1;
+  border-radius:inherit;
+  background:linear-gradient(165deg,#1D1D25 0%,#15151B 100%)}
+@keyframes nformOrbit{to{transform:rotate(1turn)}}
+.nform .form__label{color:rgba(255,255,255,.82);font-weight:500;
+  font-size:.85rem}
+.nform .form__label small{color:rgba(255,255,255,.5)}
+.nform .form__input,.nform .form__select,.nform .form__textarea{
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);
+  border-radius:.85rem;color:var(--night-fg);
+  transition:border-color .3s var(--ease-out),background .3s var(--ease-out),
+    box-shadow .3s var(--ease-out)}
+.nform .form__input::placeholder,.nform .form__textarea::placeholder{
+  color:rgba(255,255,255,.38)}
+.nform .form__select{color:var(--night-fg)}
+.nform .form__select option{color:var(--fg);background:#fff}
+.nform .form__input:focus,.nform .form__select:focus,
+.nform .form__textarea:focus{outline:none;
+  border-color:rgba(255,255,255,.6);
+  background:rgba(255,255,255,.09);
+  box-shadow:0 0 0 3px rgba(255,255,255,.18)}
+.nform .form__btn{background:#fff;color:var(--fg);font-weight:700;
+  font-size:1.02rem;padding:1.1rem 1.4rem;border-radius:99px;
+  display:inline-flex;align-items:center;justify-content:center;gap:.8rem;
+  width:100%;cursor:pointer;border:0;
+  box-shadow:0 18px 40px -16px rgba(255,255,255,.35);
+  transition:transform .25s var(--ease-out),box-shadow .3s var(--ease-out)}
+.nform .form__btn:hover{transform:translateY(-2px);
+  box-shadow:0 24px 50px -18px rgba(255,255,255,.45)}
+.nform .form__btn:active{transform:translateY(0) scale(.98)}
+.nform .form__btn svg{width:2rem;height:2rem;flex:none;border-radius:50%;
+  background:var(--fg);color:#fff;padding:.5rem;fill:none;stroke:currentColor;
+  stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
+  transition:transform .45s var(--ease-back)}
+.nform .form__btn:hover svg{transform:translate(3px,-2px)}
+.nform .form__success{color:#89CA8A}
+.nform .microcopy,.nform .form__hint{color:var(--night-muted)}
+@media (prefers-reduced-motion:reduce){
+  .nform::before{animation:none}
+}
+
+/* ============================================================
+   8 · ACCENTS DE SERVICE — chaque page de service reçoit SA
+   couleur (règle client : la page entière parle du service, la
+   couleur y est chez elle). Un accent par famille de section,
+   jamais un repeint. Les pages neutres (agence, tarifs, contact,
+   réalisations) n'ont pas de classe body : rien ne s'applique.
+   ============================================================ */
+.page-pub{--pg-grad:var(--grad-sunshine);--pg-text:var(--sunshine-text)}
+.page-seo{--pg-grad:var(--grad-mint);--pg-text:var(--mint-text)}
+.page-branding{--pg-grad:var(--grad-violet);--pg-text:var(--violet-text)}
+.page-cm{--pg-grad:var(--grad-sunset);--pg-text:var(--sunset-text)}
+.page-saas{--pg-grad:var(--grad-sky);--pg-text:var(--sky-text)}
+/* Les pictos d'eyebrow prennent l'encre du service — la signature
+   discrète qui traverse toute la page. */
+body[class^="page-"] .eyebrow .picto{color:var(--pg-text)}
+/* FAQ : le liseré de la question active. */
+body[class^="page-"] .fq-item::before{background:var(--pg-grad)}
+/* Méthode (pages qui en ont une) : le liseré de tête des étapes. */
+body[class^="page-"] .stack-card::before{background:var(--pg-grad)}
+/* Chiffres de preuve du hero. */
+body[class^="page-"] .phero__stat b,
+body[class^="page-"] .hero__stats b{color:var(--pg-text)}
+
+
+/* ============================================================
+   § 74 — UN SEUL SURVOL POUR TOUS LES BOUTONS (2026-08-14,
+   demande client : « le même effet que le bouton avis Google »)
+
+   L'effet de référence est celui de `.btn-pill` (site.css §190) :
+   un disque d'encre part DU CURSEUR et envahit la pilule, le texte
+   bascule dans la couleur qu'avait le fond, un filet de cette même
+   couleur cerne le bouton — sans lui la silhouette disparaîtrait
+   au moment précis où on la vise — et l'ensemble monte de 2px.
+
+   Ici le mécanisme devient GÉNÉRIQUE : deux variables suffisent,
+   `--enc` (la couleur qui envahit) et `--enc-fg` (celle que prend
+   le texte). Chaque famille pose son couple, et le sens de
+   l'inversion suit le bouton :
+
+   · pilule PLEINE (encre foncée, texte blanc) → elle s'éclaircit ;
+   · pilule CLAIRE sur fond sombre → elle s'assombrit ;
+   · bouton FILAIRE → il se remplit d'encre.
+
+   Même geste dans les trois cas, jamais la même direction : ce qui
+   est commun c'est le mouvement, pas la couleur.
+
+   Le disque suit `--x/--y`, posés par site.js. SANS JS il part du
+   centre (50 %/50 %) : l'effet existe quand même, il est seulement
+   moins vivant. Le survol entier est borné à `(hover:hover)` — au
+   doigt, un bouton ne doit pas rester coincé dans son état survolé.
+
+   PORTÉE : ce fichier n'est chargé que par les pages du site
+   principal. Les pages géo (site.css + geo.css) ne le voient pas —
+   périmètre gelé, elles gardent leurs survols d'origine.
+   ============================================================ */
+.btn-ghost,
+.roue-pas__aller,
+.fw-form__btn,
+.cta-form .form__btn,
+.nform .form__btn,
+.sitx__cta{
+  position:relative;isolation:isolate;overflow:hidden;
+  transition:color .4s var(--ease-out),transform .2s var(--ease-out),
+    border-color .3s var(--ease-out),box-shadow .3s var(--ease-out);
+}
+.btn-ghost::before,
+.roue-pas__aller::before,
+.fw-form__btn::before,
+.cta-form .form__btn::before,
+.nform .form__btn::before,
+.sitx__cta::before{
+  content:"";position:absolute;z-index:-1;
+  top:var(--y,50%);left:var(--x,50%);
+  width:380px;height:380px;border-radius:50%;
+  background:var(--enc,#fff);
+  /* Un SCALE composité, jamais width/height : la leçon du 2026-08-14
+     (« CTA buggés au survol ») vaut pour tous les boutons, pas que
+     pour .btn-pill. Texte et encre partagent la même durée — pas de
+     fenêtre où le texte bascule avant que l'encre ne couvre. */
+  transform:translate(-50%,-50%) scale(0);
+  transition:transform .4s var(--ease-out);
+}
+.btn-ghost::after,
+.roue-pas__aller::after,
+.fw-form__btn::after,
+.cta-form .form__btn::after,
+.nform .form__btn::after,
+.sitx__cta::after{
+  content:"";position:absolute;inset:0;border-radius:inherit;
+  border:1px solid var(--enc-fil,var(--enc-fg,var(--fg)));
+  opacity:0;pointer-events:none;
+  transition:opacity .35s var(--ease-out);
+}
+@media (hover:hover) and (pointer:fine){
+  .btn-ghost:hover,
+  .roue-pas__aller:hover,
+  .fw-form__btn:hover,
+  .cta-form .form__btn:hover,
+  .nform .form__btn:hover,
+  .sitx__cta:hover{
+    color:var(--enc-fg,var(--fg));
+    transform:translateY(-2px);
+    /* §73 poussait le lien de la roue avec la propriété `translate`,
+       canal distinct de `transform` : les deux se seraient ajoutés. */
+    translate:0;
+  }
+  .btn-ghost:hover::before,
+  .roue-pas__aller:hover::before,
+  .fw-form__btn:hover::before,
+  .cta-form .form__btn:hover::before,
+  .nform .form__btn:hover::before,
+  .sitx__cta:hover::before{transform:translate(-50%,-50%) scale(1)}
+  .btn-ghost:hover::after,
+  .roue-pas__aller:hover::after,
+  .fw-form__btn:hover::after,
+  .cta-form .form__btn:hover::after,
+  .nform .form__btn:hover::after,
+  .sitx__cta:hover::after{opacity:1}
+}
+/* — A · LES PILULES PLEINES : l'encre blanche les vide — */
+.roue-pas__aller,
+.fw-form__btn{--enc:#fff;--enc-fg:var(--fg)}
+/* §73 repeignait le fond en noir au survol : inutile sous le disque,
+   et il rallumait un fond là où l'encre en pose déjà un. */
+@media (hover:hover) and (pointer:fine){
+  .roue-pas__aller:hover{background:var(--fg)}
+  .fw-form__btn:hover{background:var(--fg)}
+}
+/* — B · LES PILULES CLAIRES SUR FOND SOMBRE : l'encre les noircit.
+   Leur flèche vit dans une pastille foncée : elle doit s'inverser
+   avec le reste, sinon elle disparaît dans l'encre. — */
+.cta-form .form__btn,
+.nform .form__btn,
+.sitx__cta{--enc:var(--fg);--enc-fg:#fff}
+@media (hover:hover) and (pointer:fine){
+  .cta-form .form__btn:hover svg,
+  .nform .form__btn:hover svg,
+  .sitx__cta:hover svg{background:#fff;color:var(--fg)}
+}
+.cta-form .form__btn svg,
+.nform .form__btn svg,
+.sitx__cta svg{
+  transition:transform .45s var(--ease-back),
+    background .35s var(--ease-out),color .35s var(--ease-out);
+}
+/* — C · LE BOUTON FILAIRE : il se remplit. Son filet lui appartient
+   déjà (border 1.5px) — on le repeint plutôt que d'en superposer un
+   second, d'où le `--enc-fil:transparent`. — */
+.btn-ghost{--enc:var(--fg);--enc-fg:#fff;--enc-fil:transparent}
+@media (hover:hover) and (pointer:fine){
+  /* site.css posait `background:var(--canvas)` : le disque le
+     recouvre, mais un fond crème resterait visible au retour du
+     curseur, quand l'encre s'est déjà rétractée. */
+  .btn-ghost:hover{background:transparent;border-color:var(--fg);
+    box-shadow:var(--shadow-md)}
+}
+
+/* ------------------------------------------------------------
+   § 74 bis — LE DISQUE DOIT COUVRIR LE BOUTON (2026-08-14,
+   retour client : « le bouton Réserver mon appel est buggé au
+   survol », idem formulaire de contact et CTA du header).
+
+   Le disque était figé à 380px, soit 190px de rayon. Or pour
+   qu'une encre partie DU CURSEUR recouvre entièrement la pilule,
+   il faut un rayon au moins égal à la DIAGONALE du bouton — le
+   curseur peut entrer par un bord, et le coin opposé est alors à
+   une diagonale de distance. Mesuré sur l'accueil : 190px de
+   rayon contre 196px de diagonale pour « Réserver mon appel »,
+   271px pour « Obtenir mon audit gratuit ». Il manquait peu, mais
+   il manquait toujours : le bord du cercle restait dans le cadre,
+   et c'est lui qu'on voyait — un croissant blanc et sa pointe au
+   lieu d'un remplissage franc.
+
+   L'encre se déduit donc du bouton : 300 % dans CHAQUE dimension.
+   Un pourcentage de largeur se mesure sur la largeur du bouton,
+   un pourcentage de hauteur sur sa hauteur — l'encre est donc
+   une ellipse aux demi-axes 1,5w et 1,5h, et elle couvre par
+   construction : depuis n'importe quel point du bouton, le coin
+   le plus lointain vaut (w/1,5w)² + (h/1,5h)² = 0,89 < 1. Vrai
+   pour tout format, y compris une pilule devenue plus HAUTE que
+   large quand son texte passe à la ligne — le cas qui restait
+   découvert avec un cercle calé sur la seule largeur. Le plancher
+   de 22rem garde l'effet ample sur les petits boutons.
+
+   PORTÉE : premium*.css seulement. `.btn-pill` est défini dans
+   site.css, que les pages géo chargent aussi — les corriger ici
+   les laisse intactes, périmètre gelé.
+   ------------------------------------------------------------ */
+.btn-pill::before,
+.actions .cta::before,
+.btn-ghost::before,
+.roue-pas__aller::before,
+.fw-form__btn::before,
+.cta-form .form__btn::before,
+.nform .form__btn::before,
+.sitx__cta::before{
+  width:max(300%,22rem);height:max(300%,22rem);
+}
+
+/* ------------------------------------------------------------
+   § 74 ter — UN SEUL PROPRIÉTAIRE PAR CALQUE (2026-08-14, retour
+   client : « une rotation bizarre du cadre à l'intérieur du
+   bouton », sur le CTA du header, celui de la méthode et celui du
+   formulaire — les autres allant bien).
+
+   Ce n'était pas la taille du disque : c'était une COLLISION.
+   Deux décorations plus anciennes vivent sur les mêmes pseudo-
+   éléments que l'encre, et sur ces boutons-là seulement :
+
+   · `anneauCta` (site.css §3) pose sur ::after un dégradé conique
+     qui tourne, pour les cibles de conversion — `[data-conversion
+     ^="lead-cta"]`, `.form__btn`, `.cta .btn-pill`. Or ::after est
+     le FILET de survol de l'encre. Le filet gardait sa bordure de
+     1px, l'anneau lui imposait son `inset:-2px` et sa rotation :
+     un cadre en pilule qui tourne dans le bouton. Et comme
+     l'anneau ne se montre qu'au survol, la collision était
+     garantie à chaque passage.
+
+   · `haloCloture` (site.css §3 du bloc clôture) vise `.cta::before`
+     pour la SECTION de clôture — mais le CTA du header porte lui
+     aussi la classe `.cta`, donc il héritait de la rotation. Sur
+     un disque parfaitement rond elle ne se voyait pas ; sur
+     l'encre elliptique du §74 bis, elle fait tanguer le
+     remplissage.
+
+   Le bouton de référence (« Voir tous nos avis Google ») n'a ni
+   `data-conversion` ni la classe `.cta` : c'est exactement pour ça
+   qu'il était le seul à se comporter correctement.
+
+   On rend donc les deux calques à l'encre. L'anneau tournant est
+   éteint sur ces pages : il ne s'affichait qu'au survol, au moment
+   même où l'encre travaille — deux mouvements pour un seul geste,
+   c'était de toute façon un de trop.
+
+   PORTÉE : premium*.css. Les deux décorations vivent dans
+   site.css, que les pages géo chargent — les neutraliser ici les
+   laisse intactes, périmètre gelé.
+   ------------------------------------------------------------ */
+[data-conversion^="lead-cta"]::after,
+.form__btn::after,
+.cta .btn-pill::after{
+  background:none;
+  animation:none;
+  inset:0;
+  z-index:auto;
+}
+/* Le halo de la section de clôture n'a rien à faire sur le bouton
+   du header : il vise `.cta`, la capsule le porte aussi. */
+.actions .cta::before{animation:none}

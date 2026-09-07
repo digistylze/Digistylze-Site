@@ -1,0 +1,267 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Harness badges tarifs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Instrument+Serif:ital@0;1&family=Martian+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/socle.css">
+<style>
+html,body{background:#F4F2EA}
+body{margin:0}
+[data-rev]{opacity:1 !important; transform:none !important}
+  /* l'indication n'apparaît que là où le tableau déborde vraiment */
+  .cmp-hint{display:none; margin:14px auto 0; text-align:center;
+    font-family:var(--f-mono); font-size:10.5px; letter-spacing:.06em; color:var(--steel2)}
+  @media (max-width:720px){ .cmp-hint{display:block} }
+
+  /* ============================================================
+     NOS OFFRES — forme reprise de la maquette fournie
+     ⚠ Accent ORANGE de la maquette non repris : le site est monochrome.
+     Seules les coches restent vertes, où la couleur trie au lieu de décorer.
+     ============================================================ */
+  .pr{background:var(--paper2); color:var(--ink);
+    padding:clamp(30px,4vh,54px) 0 clamp(44px,5.5vh,80px)}
+  /* Chapeau CENTRÉ, comme les autres sections de la page. */
+  /* ⚠ 64ch : le nouveau titre tombait sur TROIS lignes à 38ch. Le seuil des
+     deux lignes est à 56ch (620 px) ; on prend 64 pour garder de la marge
+     contre une substitution de police, tout en restant bien en deçà des
+     1080 px de la grille — le chapeau doit rester un bloc, pas une bannière. */
+  .pr-head{max-width:64ch; margin:0 auto; text-align:center}
+  .pr-eyebrow{display:flex; width:max-content; margin:0 auto; align-items:center; gap:11px;
+    font-family:var(--f-mono); font-size:11px; letter-spacing:.15em;
+    text-transform:uppercase; color:var(--ink); font-weight:600}
+  .pr-eyebrow i{display:grid; place-items:center; width:26px; height:26px; flex:none;
+    border-radius:50%; border:1.5px solid var(--ink)}
+  .pr-eyebrow svg{width:15px; height:15px; fill:none; stroke:var(--ink); stroke-width:1.6;
+    stroke-linecap:round; stroke-linejoin:round}
+  .pr-title{margin:18px 0 0; font-size:clamp(26px,3.8vw,46px); line-height:1.05;
+    font-weight:800; font-variation-settings:"wdth" 88; letter-spacing:-.03em; color:var(--ink)}
+
+  .pr-grille{display:grid; gap:clamp(14px,1.6vw,20px); align-items:stretch;
+    margin-top:clamp(28px,3.6vh,48px); grid-template-columns:1fr}
+  @media (min-width:900px){ .pr-grille{grid-template-columns:repeat(3,1fr)} }
+  /* Composition ferrée à GAUCHE. Le `padding-top` reste généreux : le badge
+     chevauche le bord haut et a besoin de la place. */
+  .pr-carte{position:relative; display:flex; flex-direction:column;
+    padding:clamp(30px,3vw,38px) clamp(22px,2.2vw,30px) clamp(22px,2.2vw,30px);
+    border-radius:22px;
+    background:var(--card); border:1px solid var(--rule2);
+    box-shadow:0 24px 52px -42px rgba(16,17,20,.42)}
+  /* ⚠ La tuile et le titre sur UNE MEME LIGNE : c'est ce qui remonte le prix.
+     Avant, la tuile occupait une rangée à elle seule et poussait tout le bloc
+     de prix vers le bas. */
+  .pr-ligne-tete{display:flex; align-items:center; gap:14px}
+  .pr-carte--vedette{background:var(--nuit); border-color:transparent; color:var(--paper);
+    box-shadow:0 34px 66px -40px rgba(11,12,15,.8)}
+  /* ---- la tuile d'icône ---- */
+  .pr-tuile{display:grid; place-items:center; width:52px; height:52px; flex:none;
+    border-radius:15px; background:var(--paper2); border:1px solid var(--rule2)}
+  .pr-carte--vedette .pr-tuile{background:rgba(244,242,234,.08); border-color:rgba(244,242,234,.16)}
+  .pr-tuile svg{width:25px; height:25px; fill:none; stroke:var(--ink); stroke-width:1.6;
+    stroke-linecap:round; stroke-linejoin:round}
+  .pr-carte--vedette .pr-tuile svg{stroke:var(--paper)}
+  /* ---- le badge ---- */
+  /* ⚠ À cheval sur le bord haut, ferré à gauche : `translateY(-50%)` le
+     centre sur la ligne du bord, pas en dessous. */
+  .pr-badge{position:absolute; top:0; left:clamp(22px,2.2vw,30px); transform:translateY(-50%);
+    display:inline-flex; align-items:center; gap:6px; z-index:2;
+    padding:6px 12px; border-radius:999px;
+    background:var(--ink); color:var(--paper);
+    font-family:var(--f-mono); font-size:9.5px; letter-spacing:.1em;
+    text-transform:uppercase; white-space:nowrap}
+  .pr-carte--vedette .pr-badge{background:var(--paper); color:var(--ink)}
+  .pr-badge svg{width:11px; height:11px; fill:currentColor; stroke:none}
+  /* ---- catégorie, prix, description ---- */
+  /* ⚠ Le nom de formule était à 10,5 px en petites capitales : il se lisait
+     comme une étiquette, pas comme un titre. Il passe en police de titrage,
+     à 26 px — assez pour porter la carte sans concurrencer le prix, qui reste
+     à 46 px. */
+  .pr-nom{margin:0; font-family:var(--f-disp); font-weight:800;
+    font-variation-settings:"wdth" 90; letter-spacing:-.022em;
+    font-size:clamp(20px,2.1vw,26px); line-height:1.15; color:var(--ink)}
+  .pr-carte--vedette .pr-nom{color:var(--paper)}
+  /* ---- LE PRIX, EN TROIS ÉTAGES ----
+     ⚠ C'est là tout l'apport de la référence : « Dès » sur sa ligne, le
+     MONTANT en très grand, l'unité à côté, la mention en dessous. Le nombre
+     devient l'objet qu'on lit au lieu d'être noyé dans une phrase.
+     ⚠ « hors TVA » est déplacé depuis la note de bas de section, pas inventé. */
+  /* ⚠ 16 px seulement : le prix suit immédiatement la ligne titre, c'est le
+     couple qu'on vient lire. */
+  .pr-prix{margin:16px 0 0; display:flex; flex-direction:column; gap:2px}
+  .pr-prix-av{font-family:var(--f-mono); font-style:normal; font-size:10px;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--steel2)}
+  .pr-carte--vedette .pr-prix-av{color:rgba(244,242,234,.6)}
+  .pr-prix-ligne{display:flex; align-items:baseline; gap:7px}
+  .pr-prix-ligne strong{font-family:var(--f-disp); font-weight:800;
+    font-variation-settings:"wdth" 88; letter-spacing:-.032em;
+    font-size:clamp(34px,3.8vw,46px); line-height:1}
+  .pr-prix-unite{font-family:var(--f-disp); font-weight:700; font-size:15px;
+    letter-spacing:-.01em; color:var(--steel2)}
+  .pr-carte--vedette .pr-prix-unite{color:rgba(244,242,234,.72)}
+  .pr-prix-pied{font-family:var(--f-mono); font-size:9.5px; letter-spacing:.1em;
+    text-transform:uppercase; color:var(--steel2)}
+  .pr-carte--vedette .pr-prix-pied{color:rgba(244,242,234,.5)}
+  .pr-desc{margin:14px 0 0; font-size:13.5px; line-height:1.55; color:var(--ink-soft)}
+  .pr-carte--vedette .pr-desc{color:rgba(244,242,234,.82)}
+  /* ⚠ Un filet sépare la promesse de la liste : sans lui, la description et
+     les inclusions se lisent comme un seul bloc de texte. */
+  .pr-incl{margin:20px 0 0; padding-top:18px; border-top:1px solid var(--rule2);
+    font-family:var(--f-mono); font-size:10px; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--steel2)}
+  .pr-carte--vedette .pr-incl{border-top-color:rgba(244,242,234,.14); color:rgba(244,242,234,.6)}
+  /* ---- la liste, à pastilles rondes ---- */
+  .pr-liste{list-style:none; margin:12px 0 0; padding:0}
+  .pr-liste li{display:flex; align-items:flex-start; gap:10px; padding:5px 0;
+    font-size:13.5px; line-height:1.45; color:var(--ink-soft)}
+  .pr-carte--vedette .pr-liste li{color:rgba(244,242,234,.86)}
+  .pr-ck{display:grid; place-items:center; width:18px; height:18px; flex:none;
+    margin-top:1px; border-radius:50%; background:rgba(30,154,92,.14)}
+  .pr-ck svg{width:11px; height:11px; fill:none; stroke:#1E9A5C; stroke-width:2.8;
+    stroke-linecap:round; stroke-linejoin:round}
+  .pr-carte--vedette .pr-ck{background:rgba(76,195,138,.18)}
+  .pr-carte--vedette .pr-ck svg{stroke:#4CC38A}
+  /* ---- le bouton : cerné sur clair, plein sur encre ----
+     ⚠ `margin-top:auto` le colle au bas de la carte : c'est lui qui aligne
+     les trois boutons alors que les listes font 8, 9 et 10 lignes. */
+  .pr-cta{margin-top:auto; width:100%; cursor:pointer;
+    display:inline-flex; align-items:center; justify-content:center; gap:10px;
+    border-radius:999px; padding:15px 22px;
+    background:transparent; color:var(--ink); border:1px solid var(--rule2);
+    font-family:var(--f-disp); font-size:12px; font-weight:600;
+    letter-spacing:.05em; text-transform:uppercase; line-height:1;
+    transition:transform .25s ease, background-color .25s ease, border-color .25s ease, color .25s ease}
+  .pr-cta svg{width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:2;
+    stroke-linecap:round; stroke-linejoin:round; transition:transform .25s ease}
+  .pr-carte--vedette .pr-cta{background:var(--paper); color:var(--ink); border-color:transparent}
+  .pr-carte .pr-cta{margin-top:22px}
+  @media (min-width:900px){ .pr-carte .pr-cta{margin-top:auto} }
+  @media (any-hover:hover){
+    .pr-cta:hover{transform:translateY(-2px)}
+    .pr-carte:not(.pr-carte--vedette) .pr-cta:hover{background:var(--ink); color:var(--paper); border-color:var(--ink)}
+    .pr-carte--vedette .pr-cta:hover{background:#fff}
+    .pr-cta:hover svg{transform:translateX(3px)}
+  }
+
+  /* ---- la bande d'inclusions communes ---- */
+  .pr-commun{display:flex; flex-wrap:wrap; align-items:center; gap:12px clamp(16px,2vw,28px);
+    margin:clamp(20px,2.6vh,30px) 0 0; padding:clamp(16px,1.8vw,22px) clamp(18px,2vw,26px);
+    border-radius:18px; background:var(--card); border:1px solid var(--rule2)}
+  .pr-commun-intro{display:inline-flex; align-items:center; gap:9px;
+    font-family:var(--f-disp); font-size:13px; font-weight:700; color:var(--ink)}
+  .pr-commun-intro svg{width:19px; height:19px; flex:none; fill:none; stroke:var(--ink);
+    stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round}
+  .pr-commun-item{display:inline-flex; align-items:center; gap:8px;
+    font-size:12.5px; color:var(--ink-soft)}
+  .pr-note{margin:14px 0 0; font-size:12.5px; line-height:1.5; color:var(--steel2)}
+
+</style>
+<link rel="stylesheet" href="_badge-fix.css">
+</head><body class="page-csw">
+<section class="pr" id="tarifs" aria-labelledby="prTitre">
+    <div class="wrap">
+      <header class="pr-head">
+        <span class="pr-eyebrow" data-rev>
+          <i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4.5 7.5h15v10h-15z"/><circle cx="12" cy="12.5" r="2.4"/></svg></i>
+          Nos offres
+        </span>
+        <h2 class="pr-title" id="prTitre" data-st="mots" style="--st-pas:28ms; --st-dep:60ms">Vous savez ce que vous payez avant de commencer.</h2>
+      </header>
+
+      <div class="pr-grille">
+        <article class="pr-carte" data-rev style="--rd:60ms">
+          <span class="pr-badge">Idéal pour lancer</span>
+          <div class="pr-ligne-tete">
+            <span class="pr-tuile" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.2c3 2.2 4.6 5.4 4.6 9L12 17l-4.6-4.8c0-3.6 1.6-6.8 4.6-9z"/><circle cx="12" cy="10.2" r="1.9"/><path d="M9.2 16.4c-1 1.4-1.2 2.8-1 4.4 1.5-.3 2.8-.9 3.7-2M14.8 16.4c1 1.4 1.2 2.8 1 4.4-1.5-.3-2.8-.9-3.7-2"/></svg></span>
+            <h3 class="pr-nom">One Pager</h3>
+          </div>
+          <div class="pr-prix">
+            <em class="pr-prix-av">Dès</em>
+            <span class="pr-prix-ligne"><strong>990</strong><span class="pr-prix-unite">CHF</span></span>
+          </div>
+          <p class="pr-desc">Idéal pour lancer votre activité avec une page claire, professionnelle et pensée pour convertir.</p>
+          <p class="pr-incl">Inclus</p>
+          <ul class="pr-liste">
+            <li><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span><span>1 page complète sur-mesure</span></li>
+            <li><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span><span>Structure UX pensée pour convertir</span></li>
+            <li><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span><span>Rédaction et mise en forme des contenus</span></li>
+            <li><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span><span>Design 100 % sur-mesure</span></li>
+            <li><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span><span>Responsive mobile, tablette &amp; desktop</span></li>
+            <li><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span><span>Formulaire de contact + CTA</span></li>
+            <li><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span><span>Bases SEO + sitemap</span></li>
+            <li><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span><span>Mise en ligne &amp; sécurisation</span></li>
+          </ul>
+          <button class="pr-cta proj-open" type="button">Discuter de mon projet
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </article>
+        <article class="pr-carte pr-carte--vedette" data-rev style="--rd:150ms">
+          <span class="pr-badge">Populaire<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.4l2.3 4.8 5.2.7-3.8 3.6 1 5.2-4.7-2.6-4.7 2.6 1-5.2L4.5 9.9l5.2-.7z"/></svg></span>
+          <div class="pr-ligne-tete">
+            <span class="pr-tuile" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.6" y="5.2" width="16.8" height="13.6" rx="2.4"/><path d="M3.6 9.4h16.8"/><circle cx="6.6" cy="7.3" r=".7"/><circle cx="9" cy="7.3" r=".7"/></svg></span>
+            <h3 class="pr-nom">Site vitrine</h3>
+          </div>
+          <div class="pr-prix">
+            <em class="pr-prix-av">Dès</em>
+            <span class="pr-prix-ligne"><strong>2’990</strong><span class="pr-prix-unite">CHF</span></span>
+          </div>
+          <p class="pr-desc">Pour transformer votre site en véritable outil commercial.</p>
+          <p class="pr-incl">Inclus</p>
+          <ul class="pr-liste">
+            <li><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span><span>Arborescence et parcours utilisateur</span></li>
+            <li><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span><span>Textes, visuels et contenus pris en charge</span></li>
+            <li><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span><span>Design 100 % sur-mesure</span></li>
+            <li><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span><span>Développement responsive</span></li>
+            <li><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span><span>Formulaires &amp; CTA pensés pour convertir</span></li>
+            <li><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span><span>SEO intégré dès la conception</span></li>
+            <li><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span><span>Connexion Analytics / outils de suivi</span></li>
+            <li><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span><span>Mise en ligne, SSL, sécurité &amp; sauvegardes</span></li>
+            <li><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span><span>Conformité LPD et gestion des cookies</span></li>
+          </ul>
+          <button class="pr-cta proj-open" type="button">Discuter de mon projet
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </article>
+        <article class="pr-carte" data-rev style="--rd:240ms">
+          <div class="pr-ligne-tete">
+            <span class="pr-tuile" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3.4 4.6h2.3l2.1 9.8h9.3l1.9-7.2H6.6"/><circle cx="9.4" cy="18.6" r="1.5"/><circle cx="16.4" cy="18.6" r="1.5"/></svg></span>
+            <h3 class="pr-nom">E-commerce</h3>
+          </div>
+          <div class="pr-prix">
+            <em class="pr-prix-av">Dès</em>
+            <span class="pr-prix-ligne"><strong>4’990</strong><span class="pr-prix-unite">CHF</span></span>
+          </div>
+          <p class="pr-desc">Pour vendre en ligne avec une boutique crédible, fluide et simple à gérer.</p>
+          <p class="pr-incl">Inclus</p>
+          <ul class="pr-liste">
+            <li><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span><span>Architecture catégories &amp; produits</span></li>
+            <li><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span><span>Design e-commerce 100 % sur-mesure</span></li>
+            <li><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span><span>Parcours et tunnel d’achat optimisés</span></li>
+            <li><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span><span>Paiements : Twint, cartes, PostFinance…</span></li>
+            <li><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span><span>Configuration livraison &amp; commandes</span></li>
+            <li><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span><span>Responsive mobile, tablette &amp; desktop</span></li>
+            <li><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span><span>Bases SEO e-commerce</span></li>
+            <li><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span><span>Emails transactionnels configurés</span></li>
+            <li><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span><span>Formation à la gestion de la boutique</span></li>
+            <li><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span><span>Mise en ligne, sécurité &amp; sauvegardes</span></li>
+          </ul>
+          <button class="pr-cta proj-open" type="button">Discuter de mon projet
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </article>
+      </div>
+
+      <div class="pr-commun" data-rev>
+        <span class="pr-commun-intro">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.6 19 6.4v5.3c0 4.1-2.9 7.2-7 8.4-4.1-1.2-7-4.3-7-8.4V6.4z"/><path d="M9.4 12.1l1.9 1.9 3.4-3.7"/></svg>
+          Inclus dans toutes les formules
+        </span>
+        <span class="pr-commun-item"><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span>Briefing de cadrage</span>
+        <span class="pr-commun-item"><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span>Audit &amp; recommandations</span>
+        <span class="pr-commun-item"><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span>Certificat SSL (HTTPS)</span>
+        <span class="pr-commun-item"><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span>Conformité LPD &amp; RGPD</span>
+        <span class="pr-commun-item"><span class="pr-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span>Vérifications après mise en ligne</span>
+      </div>
+      <p class="pr-note" data-rev>Chaque projet reçoit un devis détaillé et définitif avant le lancement. Pas de suppléments surprise. Prix affichés hors TVA.</p>
+    </div>
+  </section>
+</body></html>

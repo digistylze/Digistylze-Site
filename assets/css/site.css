@@ -1,0 +1,1940 @@
+/* ================================================================
+   DIGISTYLZE — SHELL PARTAGÉ
+   Source unique pour : tokens, reset, utilitaires, préloader,
+   navigation, footer, widget flottant et la bibliothèque de
+   composants visuels réutilisables.
+
+   Chargé par les 34 pages via <link rel="stylesheet"
+   href="assets/css/site.css">. Le CSS propre à une seule page reste
+   dans le <style> de cette page.
+   ================================================================ */
+
+/* ============================================================
+   TOKENS GLOBAUX — styleguide.md (white mode Digistylze)
+   ============================================================ */
+:root{
+  --bg:#FFFFFF; --canvas:#FAFAFB; --canvas-2:#F4F4F7;
+  --fg:#141418; --fg-soft:#3C3C45; --muted:#6E6E7A;
+  --line:#E4E4EA; --line-soft:#EFEFF3;
+  --night:#0E0E12; --night-fg:rgba(255,255,255,.92); --night-muted:rgba(255,255,255,.60);
+  --grad-coral:linear-gradient(180deg,#FBB78E 0%,#EA5753 100%);
+  --grad-violet:linear-gradient(180deg,#BE9AC7 0%,#7466AD 100%);
+  --grad-mint:linear-gradient(180deg,#5BC9E6 0%,#89CA8A 100%);
+  --grad-sky:linear-gradient(180deg,#A3CAEB 0%,#3F71B7 100%);
+  --grad-sunshine:linear-gradient(180deg,#FDEC06 0%,#F7A2A2 100%);
+  --grad-sunset:linear-gradient(180deg,#ED1D8D 0%,#F05066 46%,#FDB830 100%);
+  /* --grad-spectrum (7 teintes) supprimé le 2026-08-04. Un dégradé qui traverse
+     tout le spectre ne dit rien du service concerné et lit « générique ». La
+     hiérarchie passe désormais par le contraste de graisse et les filets neutres. */
+  --coral-text:#B83E3B; --violet-text:#7466AD; --mint-text:#23768B;
+  --sky-text:#3F71B7; --sunshine-text:#946200; --sunset-text:#B5156B;
+  --success:#2FA66A;
+  /* Une seule police sur tout le site. JetBrains Mono servait aux surtitres,
+     aux chiffres et aux libellés techniques ; elle est retirée le 2026-08-05 —
+     un libellé en capitales monospace très espacées est devenu le marqueur
+     visuel du site généré, et deux familles pour un site vitrine monochrome
+     n'apportaient rien que Kanit ne sache faire par la graisse et la casse.
+     Le jeton `--font-mono` est supprimé volontairement : s'il en restait un
+     usage quelque part, `var(--font-mono)` devient invalide et la propriété
+     retombe sur l'héritage, donc sur Kanit. Aucune régression possible. */
+  --font:'Kanit',system-ui,-apple-system,'Segoe UI',sans-serif;
+  /* LE RAIL — voir la règle de composition plus bas, avant `.wrap`.
+     `--gutter` est passée le 2026-08-05 de clamp(1rem,3vw,2rem) à la valeur
+     ci-dessous. Au-delà de ~1300px de fenêtre le rail de 1200px domine et
+     rien ne change ; en dessous, la page gagne 4px sur mobile et 15px sur
+     tablette. C'est là que se joue la respiration, pas sur grand écran. */
+  --maxw:1200px; --gutter:clamp(1.25rem,4.5vw,2.75rem); --section-y:clamp(4rem,8vw,7rem);
+  /* Les deux crans de densité verticale, ajoutés le 2026-08-12. Le site
+     n'en avait qu'un : `--section-y`, soit 102px en haut ET en bas, sur
+     douze sections d'affilée. Aucune section ne pouvait être plus courte
+     ou plus longue qu'une autre parce que le vocabulaire ne contenait
+     aucun cran. Voir `.sc--tight` / `.sc--tall` dans sc.css. */
+  --sy-tight:calc(var(--section-y) * .55);
+  --sy-tall:calc(var(--section-y) * 1.55);
+  /* LA TROISIÈME SURFACE, ajoutée le 2026-08-12.
+     Le site avait quatre fonds de section — #FFFFFF, #FAFAFB, #F8F9FA,
+     #F4F4F7 — tous à moins de 3 points de clarté les uns des autres :
+     à l'œil, une seule surface. L'alternance existait et était respectée,
+     elle était simplement invisible. `--sand` est le cran qui manquait
+     entre le blanc (L* 100) et l'encre (L* 4).
+     Neutre volontairement : c'est l'écart de clarté qui scande une page,
+     pas la teinte — et la charte du site est noir et blanc.
+     `--canvas` et `--canvas-2` cessent d'être des fonds de SECTION ; ils
+     restent pour les surfaces internes (cartes, champs, survols). */
+  --sand:#EDEDF1;
+  /* La seule largeur admise à côté du rail : la colonne centrée des sections
+     purement typographiques (héros, FAQ, clôtures, pages légales). Elle
+     remplace à elle seule les 40/44/46/47/50/52/54/56/60/64/70rem d'avant. */
+  --maxw-col:52rem;
+  /* Mesures de lecture. Elles s'appliquent DANS le rail, jamais à sa place. */
+  --measure:68ch; --measure-lede:54ch;
+  --radius-sm:8px; --radius-md:12px; --radius-lg:20px; --radius-xl:28px; --radius-pill:999px;
+  /* --shadow-sm manquait : premium.css:545 et :756 la lisaient depuis
+     toujours, la déclaration était donc invalide et `box-shadow` retombait
+     sur `none`. Deux composants — la pastille de logo d'un cas client et
+     l'étiquette d'une planche — n'avaient silencieusement aucune ombre.
+     Même structure à deux couches que les deux autres : une ombre large qui
+     décolle, une ombre de contact qui pose. Ajoutée le 2026-08-12. */
+  --shadow-sm:0 2px 6px -2px rgba(20,20,24,.10),0 1px 2px rgba(20,20,24,.05);
+  --shadow-md:0 6px 16px -6px rgba(20,20,24,.12),0 2px 4px rgba(20,20,24,.06);
+  --shadow-lg:0 18px 40px -12px rgba(20,20,24,.18),0 6px 12px rgba(20,20,24,.06);
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  --ease-back:cubic-bezier(.34,1.56,.64,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);line-height:1.6;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+img,video{max-width:100%;height:auto;display:block}
+a{text-decoration:none;color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
+/* `code` et `kbd` prennent la monospace du navigateur par défaut : c'est la
+   dernière porte par laquelle une seconde famille rentrerait sur un site qui
+   n'en veut qu'une. Ils héritent donc de Kanit comme le reste. */
+code,kbd,samp,pre{font-family:inherit;font-size:inherit}
+ul{list-style:none}
+summary{cursor:pointer;list-style:none}
+summary::-webkit-details-marker{display:none}
+:focus-visible{outline:2px solid currentColor;outline-offset:2px;border-radius:.3rem}
+
+/* ============================================================
+   LE RAIL — la règle de composition horizontale du site
+   ============================================================
+   UNE SEULE largeur pose la marge : celle du rail. Le site en comptait 29
+   avant le 2026-08-05, parce que chaque section déclarait son propre
+   conteneur `*__inner` avec son propre `max-width` (44rem, 52rem, 56rem,
+   64rem, 70rem…) et son propre `margin:0 auto`. Chacune se centrait donc à
+   une abscisse différente : l'œil qui descendait la page voyait le texte
+   se décaler d'un bloc au suivant. C'est ce qui faisait « bricolé ».
+
+   QUI PORTE QUOI. Le site avait aussi deux conventions de gouttière, à 146
+   contre 6. La majorité l'emporte, et les six exceptions (en-tête, pied de
+   page, héros de l'accueil, trois sections de bibliothèque) ont été ralliées
+   le 2026-08-05 :
+
+     LA SECTION porte la gouttière   →  padding:var(--section-y) var(--gutter)
+     LE CONTENEUR porte la largeur   →  .wrap, ou max-width + margin:0 auto
+
+   Les deux ensemble ne se voient qu'au-dessus de 1288px de fenêtre, mais
+   elles y décalaient le contenu de 44px selon la section. C'était l'autre
+   moitié du défaut.
+
+   Trois interdits, tenus par `tools/rail.py --check` :
+   1. Aucun conteneur de section ne déclare son propre `max-width` en dur.
+      Il porte `.wrap`, `var(--maxw)` ou `var(--maxw-col)`.
+   2. Aucun conteneur ne porte la gouttière : elle appartient à la section.
+   3. Une mesure de lecture plus étroite (`--measure`, `--measure-lede`) est
+      un réglage de la COLONNE DE TEXTE, pas du conteneur. Elle s'applique
+      à l'intérieur du rail et SANS `margin-inline:auto` : le bloc tombe sur
+      le bord du rail au lieu de se recentrer à une autre largeur.
+
+   Deux exceptions, et deux seulement : `.fw-modal__dialog` (c'est une
+   modale, elle n'est pas dans le flux) et les gabarits de `geo.css` (pages
+   gelées depuis le 2026-08-04). */
+.section{padding-block:var(--section-y);padding-inline:var(--gutter)}
+.wrap{width:100%;max-width:var(--maxw);margin-inline:auto}
+.wrap--col{max-width:var(--maxw-col)}
+/* Colonnes de texte. À poser SUR le bloc de texte, dans un `.wrap`. */
+.measure{max-width:var(--measure)}
+.measure-lede{max-width:var(--measure-lede)}
+
+/* Le surtitre est de l'encre, pas du gris : il ouvre la section, il ne la
+   commente pas. C'est la règle de la v2 (`--color-accent` y vaut #111216).
+   Une teinte de domaine peut le repeindre localement, jamais `--muted`. */
+/* .8125rem, la valeur de la v2 : Kanit est nettement plus étroite qu'une
+   monospace, le .72rem calibré pour JetBrains Mono rendait le surtitre trop
+   maigre une fois la police changée. */
+.eyebrow{font-size:.8125rem;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--fg)}
+/* L'EN-TÊTE DE SECTION — le défaut s'inverse le 2026-08-12.
+   Le site comptait 142 `.section-head`, tous centrés, tous à 44rem, tous
+   avec la même respiration : du premier au dernier écran, chaque section
+   rejouait la même ouverture. Quelle que soit la valeur du fond, la page
+   se lisait plate — et ce n'était pas le padding, c'était cette règle.
+   Le centrage devient donc une INTENTION à déclarer, pas un défaut subi.
+   Les 142 en-têtes existants reçoivent `--center` dans le même lot : le
+   rendu ne bouge pas d'un pixel. Ils le perdront page par page, au fur et
+   à mesure des recompositions.
+   Le 44rem de `--center` est conservé tel quel pour que ce lot reste
+   neutre. C'est une mesure de lecture posée sur un bloc de texte, pas une
+   largeur de conteneur — mais elle reste à rallier aux jetons `--measure*`
+   quand les recompositions l'auront rendue marginale. */
+.section-head{margin:0 0 clamp(2.4rem,5vw,3.4rem)}
+.section-head--center{text-align:center;max-width:44rem;margin-inline:auto}
+.section-head .eyebrow{display:inline-block;margin-bottom:.7rem}
+/* L'ÉCHELLE DE DISPLAY — relevée le 2026-08-12.
+   Le site n'avait qu'un cran de titre de section : clamp(1.8rem, 3.8vw,
+   2.7rem), du premier au dernier écran, sur les quinze pages. Une page
+   dont tous les titres font la même taille se lit comme une liste de
+   rubriques, pas comme une descente qui hiérarchise.
+
+   Le plafond passe de 2,7 à 3,4rem et la pente de 3,8 à 4,6vw : le
+   titre d'une section respire enfin l'écart avec le corps de texte que
+   les sites de référence tiennent. Le plancher mobile ne bouge presque
+   pas (1,8 → 1,95rem) — c'est en grand format que le manque se voyait.
+
+   `text-wrap:balance` : un titre de trois mots sur deux lignes dont la
+   seconde n'en porte qu'un est le défaut le plus visible d'un gros
+   display. Le navigateur équilibre les lignes lui-même.
+
+   Reste dans la loi : Kanit, graisse 600, aucun dégradé clip-text.
+   L'échelle est libre, les quatre graisses ne le sont pas. */
+.section-head h2{font-size:clamp(1.95rem,4.6vw,3.4rem);font-weight:600;
+  letter-spacing:-.035em;line-height:1.04;text-wrap:balance}
+.section-head p{margin-top:1rem;color:var(--muted);font-weight:400;line-height:1.6;
+  max-width:var(--measure-lede)}
+/* Le chapeau d'un en-tête centré se recentre avec lui. */
+.section-head--center p{margin-inline:auto}
+.microcopy{font-size:.8rem;color:var(--muted);font-weight:400}
+.btn-pill{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
+  padding:.95rem 1.7rem;border-radius:var(--radius-pill);border:0;cursor:pointer;
+  background:var(--fg);color:#fff;font-weight:600;font-size:.95rem;
+  position:relative;isolation:isolate;overflow:hidden;
+  transition:color .4s var(--ease-out),transform .2s var(--ease-out)}
+.btn-pill svg{width:1rem;height:1rem}
+/* La pastille d'encre en SCALE et non en width/height (2026-08-14,
+   retour client « CTA buggés au survol ») : la transition de layout
+   d'un pseudo de 380px se peignait mal (pilule noire, texte
+   disparu) — un transform composité ne peut pas rater, et texte et
+   encre partagent la MÊME durée : plus de fenêtre où le texte
+   bascule avant que l'encre ne couvre. */
+.btn-pill::before{content:"";position:absolute;z-index:-1;top:var(--y,50%);left:var(--x,50%);
+  width:380px;height:380px;border-radius:50%;background:#fff;
+  transform:translate(-50%,-50%) scale(0);
+  transition:transform .4s var(--ease-out)}
+/* LE FILET DE SURVOL — signalé par Bastien le 2026-08-05.
+   Le disque blanc envahit le bouton au survol : il passe de noir sur fond
+   clair à blanc sur fond clair, et sa silhouette disparaît au moment précis
+   où le curseur la désigne. Un bouton doit rester un objet quand on le vise.
+
+   Le filet est un `::after` et non une `border` : une bordure décalerait la
+   boîte de 1px au survol. Et non plus un `outline`, qui l'emporterait sur
+   l'anneau de `:focus-visible` sur un bouton à la fois survolé et focalisé.
+   Sans z-index, il se peint au-dessus du `::before` en z-index -1. */
+.btn-pill::after{content:"";position:absolute;inset:0;border-radius:inherit;
+  border:1px solid var(--fg);opacity:0;pointer-events:none;
+  transition:opacity .35s var(--ease-out)}
+@media (hover:hover) and (pointer:fine){
+  .btn-pill:hover{color:var(--fg);transform:translateY(-2px)}
+  .btn-pill:hover::before{transform:translate(-50%,-50%) scale(1)}
+  .btn-pill:hover::after{opacity:1}
+}
+.btn-ghost{display:inline-flex;align-items:center;gap:.5rem;padding:.95rem 1.5rem;
+  border-radius:var(--radius-pill);border:1px solid var(--line);color:var(--fg);
+  font-weight:600;font-size:.95rem;transition:border-color .25s,background .25s}
+.btn-ghost:hover{border-color:var(--fg);background:var(--canvas)}
+.arrow-link{display:inline-flex;align-items:center;gap:.45rem;font-weight:600;font-size:.95rem}
+.arrow-link svg{width:1rem;height:1rem;fill:none;stroke:currentColor;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round;transition:transform .25s var(--ease-out)}
+.arrow-link:hover svg{transform:translateX(4px)}
+.wf-js .wf-rev{opacity:0;transform:translateY(24px);
+  transition:opacity .7s var(--ease-out),transform .8s var(--ease-out);transition-delay:var(--d,0s)}
+.wf-js .wf-rev.is-in{opacity:1;transform:none}
+/* L'EN-TÊTE DE SECTION entre en trois temps — surtitre, titre, sous-texte —
+   avec le micro-flou qui signe déjà les rangées de tableau. Le bloc parent
+   ne bouge plus lui-même : ce sont ses enfants qui portent la cascade. */
+.wf-js .section-head.wf-rev{opacity:1;transform:none}
+.wf-js .section-head.wf-rev>*{opacity:0;transform:translateY(18px);filter:blur(6px);
+  transition:opacity .6s var(--ease-out),transform .7s var(--ease-out),
+    filter .6s var(--ease-out);
+  transition-delay:calc(var(--d,0s) + var(--dh,0s))}
+.wf-js .section-head.wf-rev>h2{--dh:.09s}
+.wf-js .section-head.wf-rev>p{--dh:.18s}
+.wf-js .section-head.wf-rev.is-in>*{opacity:1;transform:none;filter:none}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{transition:none!important;animation:none!important}
+  .wf-js .wf-rev{opacity:1!important;transform:none!important}
+  .wf-js .section-head.wf-rev>*{opacity:1!important;transform:none!important;filter:none!important}
+}
+body{animation:pageIn .45s var(--ease-out)}
+@keyframes pageIn{from{opacity:0}to{opacity:1}}
+body.is-leaving{opacity:0;transition:opacity .25s var(--ease)}
+
+/* ============================================================
+   PRELOADER — preloader-logo-draw (1re visite / session)
+   ============================================================ */
+.loader{position:fixed;inset:0;z-index:200;background:var(--night);color:#fff;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;
+  opacity:0;pointer-events:none;transition:opacity .3s var(--ease-out)}
+.loader.is-on{opacity:1;pointer-events:auto}
+.loader__logo{width:3.4rem;height:3.4rem;display:block}
+.loader__circle{fill:none;stroke:#fff;stroke-width:3;stroke-linecap:round;
+  stroke-dasharray:283;transform:rotate(-90deg);transform-origin:center}
+.loader.is-on .loader__circle{animation:trace .6s var(--ease-out) forwards}
+@keyframes trace{from{stroke-dashoffset:283}to{stroke-dashoffset:0}}
+.loader__word{font-weight:700;letter-spacing:.28em;font-size:.8rem;text-transform:uppercase;
+  color:#fff}
+
+/* ============================================================
+   NAVIGATION — nav-megamenu-hover
+   ============================================================ */
+.header{position:sticky;top:0;z-index:90;background:rgba(255,255,255,.86);
+  backdrop-filter:blur(14px) saturate(140%);-webkit-backdrop-filter:blur(14px) saturate(140%);
+  border-bottom:1px solid var(--line);padding-inline:var(--gutter)}
+.header__inner{max-width:var(--maxw);margin:0 auto;height:4.2rem;
+  display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.logo{display:flex;align-items:center}
+.logo img{height:1.35rem;width:auto}
+.actions{display:flex;gap:.6rem;align-items:center}
+.actions .cta{font-size:.88rem;font-weight:600;color:#fff;background:var(--fg);
+  padding:.6rem 1.25rem;border-radius:var(--radius-pill);
+  position:relative;isolation:isolate;overflow:hidden;
+  transition:color .4s var(--ease-out)}
+@media (hover:hover) and (pointer:fine){
+  /* même correctif que .btn-pill : scale composité, texte et encre
+     synchrones (2026-08-14) */
+  .actions .cta::before{content:"";position:absolute;z-index:-1;top:var(--y,50%);left:var(--x,50%);
+    width:320px;height:320px;border-radius:50%;background:#fff;
+    transform:translate(-50%,-50%) scale(0);
+    transition:transform .4s var(--ease-out)}
+  /* Même disque, même défaut, même filet : le bouton de l'en-tête se vide
+     lui aussi sur une barre presque blanche. */
+  .actions .cta::after{content:"";position:absolute;inset:0;border-radius:inherit;
+    border:1px solid var(--fg);opacity:0;pointer-events:none;
+    transition:opacity .35s var(--ease-out)}
+  .actions .cta:hover{color:var(--fg)}
+  .actions .cta:hover::before{transform:translate(-50%,-50%) scale(1)}
+  .actions .cta:hover::after{opacity:1}
+}
+.mm{position:relative;display:flex;align-items:center}
+.mm__item{position:static}
+.mm__btn{display:inline-flex;align-items:center;gap:.3rem;cursor:pointer;
+  background:none;border:0;font:inherit;color:var(--muted);
+  padding:.4rem 1rem;font-size:.9rem;font-weight:500;position:relative;z-index:1;
+  transition:color .3s}
+.mm__btn:hover,.mm__btn.is-active{color:var(--fg)}
+.mm__btn .chev{width:1rem;height:1rem;opacity:.8;transition:transform .3s var(--ease-out)}
+.mm__btn.is-open .chev{transform:rotate(180deg)}
+.mm__pill{position:absolute;top:0;left:0;height:0;width:0;background:rgba(20,20,24,.05);
+  border-radius:var(--radius-pill);opacity:0;pointer-events:none;z-index:0;
+  transition:transform .3s var(--ease-out),width .3s var(--ease-out),
+    height .3s var(--ease-out),opacity .2s}
+.mm__pill.show{opacity:1}
+.mm__panel{position:absolute;top:calc(100% + .6rem);left:0;z-index:95;
+  width:0;height:0;overflow:hidden;background:var(--bg);border:1px solid var(--line);
+  border-radius:16px;box-shadow:var(--shadow-lg);
+  opacity:0;pointer-events:none;transform:translateY(-6px);
+  transition:width .32s var(--ease-out),height .32s var(--ease-out),
+    left .32s var(--ease-out),opacity .22s var(--ease-out),transform .22s var(--ease-out)}
+.mm__panel.open{opacity:1;pointer-events:auto;transform:translateY(0)}
+/* `flex-wrap` + `max-width` (posé par site.js) permettent au panneau de se
+   réorganiser en colonnes quand la place manque, au lieu de pousser sa largeur
+   naturelle hors du viewport. */
+.mm__inner{position:absolute;top:0;left:0;padding:1.1rem;display:flex;flex-wrap:wrap;
+  gap:2.25rem;width:max-content}
+.mm__measure{position:absolute;visibility:hidden;pointer-events:none;
+  top:-9999px;left:-9999px;padding:1.1rem;display:flex;flex-wrap:wrap;
+  gap:2.25rem;width:max-content}
+.mm__col{min-width:0}
+.mm__col h3{margin-bottom:1rem;font-size:.68rem;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.mm__col ul{display:flex;flex-direction:column;gap:1.15rem}
+.mm__link{display:flex;align-items:flex-start;gap:.75rem}
+.mm__ico{flex:0 0 auto;display:flex;align-items:center;justify-content:center;
+  width:2.25rem;height:2.25rem;border:1px solid var(--line);border-radius:.55rem;
+  color:var(--fg);transition:background .3s,color .3s,border-color .3s}
+.mm__ico svg{width:1.1rem;height:1.1rem}
+.mm__ico.t-coral{background:var(--grad-coral);border:0;color:#fff}
+.mm__ico.t-violet{background:var(--grad-violet);border:0;color:#fff}
+.mm__ico.t-mint{background:var(--grad-mint);border:0;color:#fff}
+.mm__ico.t-sky{background:var(--grad-sky);border:0;color:#fff}
+.mm__ico.t-sunshine{background:var(--grad-sunshine);border:0;color:var(--fg)}
+.mm__ico.t-sunset{background:var(--grad-sunset);border:0;color:#fff}
+/* `width:max-content` garantissait qu'une description ne se coupe JAMAIS, donc
+   que le panneau s'élargisse indéfiniment. C'est l'inverse qu'on veut. */
+.mm__txt{line-height:1.25;min-width:0}
+.mm__txt b{display:block;font-size:.875rem;font-weight:600;color:var(--fg)}
+.mm__txt span{display:block;font-size:.75rem;color:var(--muted);transition:color .3s}
+.mm__link:hover .mm__txt span{color:var(--fg)}
+@keyframes navDrop{from{opacity:0;transform:translateY(-110%)}to{opacity:1;transform:translateY(0)}}
+@keyframes navIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.header__inner{animation:navDrop .7s var(--ease-out) backwards}
+.header__inner .logo{animation:navIn .6s var(--ease-out) .25s backwards}
+.mm__item{animation:navIn .6s var(--ease-out) .37s backwards}
+.mm__item:nth-child(2){animation-delay:.43s}
+.mm__item:nth-child(3){animation-delay:.49s}
+.mm__item:nth-child(4){animation-delay:.55s}
+.mm__item:nth-child(5){animation-delay:.61s}
+.actions .cta{animation:navIn .6s var(--ease-out) .73s backwards}
+@media (max-width:860px){
+  /* Sous 860px le méga-menu disparaît entièrement au profit du tiroir : il
+     étalait ses 5 rubriques sur trois rangées au-dessus du CTA, ce qui
+     obligeait le header à passer en hauteur automatique. La hauteur fixe
+     revient donc avec lui. */
+  .mm{display:none}
+}
+@media (max-width:520px){
+  /* Sur les petits téléphones le header doit loger logo + burger + pilule :
+     ça ne tient pas, et c'est la pilule qui saute. Elle n'est pas perdue —
+     elle est en pied de tiroir, et le widget flottant la propose dès que
+     l'utilisateur a lu la moitié du hero. */
+  .actions .cta{display:none}
+}
+
+/* ============================================================
+   NAVIGATION MOBILE — burger + tiroir latéral (≤ 860px)
+   Construit par site.js depuis le même tableau NAV que le
+   méga-menu desktop : aucune des 34 pages n'a de markup de nav.
+   ============================================================ */
+.nav-burger{display:none;align-items:center;justify-content:center;
+  width:2.75rem;height:2.75rem;border:0;background:none;cursor:pointer;
+  color:var(--fg);border-radius:var(--radius-sm);flex-direction:column;gap:5px}
+/* L'affichage du burger est piloté ICI et non dans le bloc nav ≤860 plus haut :
+   à spécificité égale, c'est la dernière règle du fichier qui gagne, et la
+   déclaration `display:none` ci-dessus annulerait un `inline-flex` écrit avant. */
+@media (max-width:860px){ .nav-burger{display:inline-flex} }
+.nav-burger span{display:block;width:19px;height:2px;border-radius:2px;
+  background:currentColor;transition:transform .3s var(--ease-out),opacity .2s}
+.nav-burger[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.nav-burger[aria-expanded="true"] span:nth-child(2){opacity:0}
+.nav-burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+/* `overflow:hidden` n'est pas décoratif : au repos le panneau est translaté
+   de 100% vers la droite, donc hors du viewport. Sans clipping, ce
+   débordement se propage à la zone de défilement du document et ajoute une
+   barre horizontale sur les 34 pages, tiroir fermé. */
+.nav-drawer{position:fixed;inset:0;top:0;right:0;bottom:0;left:0;
+  z-index:110;visibility:hidden;overflow:hidden}
+/* Sur iOS, un calque qui glisse PAR-DESSUS un élément à backdrop-filter
+   (le header flouté) se peint parfois au mauvais endroit pendant quelques
+   frames — le panneau semblait traverser l'écran. Le voile couvre le
+   header quand le tiroir est ouvert : suspendre son flou ne se voit pas,
+   et prive le compositeur de l'occasion de se tromper. */
+html.nav-ouverte .header{backdrop-filter:none;-webkit-backdrop-filter:none}
+/* Ouverture en deux temps pilotée par le script : `is-visible` rend le
+   tiroir peignable AVEC le panneau encore hors écran, une frame est
+   committée, PUIS `is-open` lance la glissière. Aucun moteur ne peut ainsi
+   peindre un état intermédiaire mal positionné. */
+.nav-drawer.is-visible,
+.nav-drawer.is-open{visibility:visible}
+.nav-drawer__scrim{position:absolute;inset:0;top:0;right:0;bottom:0;left:0;
+  background:rgba(14,14,18,.5);opacity:0;transition:opacity .3s var(--ease)}
+.nav-drawer.is-open .nav-drawer__scrim{opacity:1}
+.nav-drawer__panel{position:absolute;top:0;right:0;bottom:0;width:min(88vw,24rem);
+  background:var(--bg);border-left:1px solid var(--line);
+  display:flex;flex-direction:column;
+  box-shadow:-20px 0 50px -20px rgba(20,20,24,.35);
+  transform:translateX(100%);transition:transform .38s var(--ease-out);
+  will-change:transform}
+.nav-drawer.is-open .nav-drawer__panel{transform:translateX(0)}
+.nav-drawer__head{display:flex;align-items:center;justify-content:space-between;
+  padding:0 1rem 0 1.25rem;height:4.2rem;border-bottom:1px solid var(--line-soft);flex-shrink:0}
+.nav-drawer__head img{height:1.35rem;width:auto}
+.nav-drawer__close{width:2.75rem;height:2.75rem;border:0;background:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;color:var(--fg);
+  border-radius:50%;transition:background .2s}
+.nav-drawer__close:hover{background:var(--canvas-2)}
+.nav-drawer__close svg{width:1.1rem;height:1.1rem;fill:none;stroke:currentColor;
+  stroke-width:2;stroke-linecap:round}
+.nav-drawer__body{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:1.25rem 0 1.5rem}
+.nav-drawer__group{padding:0 1.25rem;margin-bottom:1.4rem}
+.nav-drawer__group h3{font-size:.62rem;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem}
+.nav-drawer__link{display:flex;align-items:center;gap:.8rem;padding:.7rem .5rem;
+  margin:0 -.5rem;border-radius:var(--radius-md);min-height:44px;
+  transition:background .2s var(--ease)}
+.nav-drawer__link:hover{background:var(--canvas)}
+.nav-drawer__link b{display:block;font-size:.95rem;font-weight:600;line-height:1.25}
+.nav-drawer__link span{display:block;font-size:.78rem;color:var(--muted);font-weight:400}
+/* La règle générique du tiroir (`.nav-drawer__link span{display:block}`)
+   écrasait le display:flex de la pastille — icône décentrée en haut-gauche,
+   boîte étirée. On lui rend sa géométrie, à spécificité supérieure. */
+.nav-drawer__link span.mm__ico{display:flex;align-items:center;justify-content:center;
+  width:2.25rem;height:2.25rem;flex:0 0 auto}
+.nav-drawer__link.is-active{background:var(--canvas-2)}
+.nav-drawer__link.is-active b{font-weight:600}
+.nav-drawer__sep{height:1px;background:var(--line-soft);margin:0 1.25rem 1.4rem}
+.nav-drawer__foot{flex-shrink:0;border-top:1px solid var(--line-soft);padding:1rem 1.25rem;
+  display:flex;flex-direction:column;gap:.65rem}
+.nav-drawer__foot .btn-pill{width:100%}
+.nav-drawer__tel{display:flex;flex-direction:column;gap:.15rem;
+  font-size:.76rem;color:var(--muted)}
+.nav-drawer__tel a{color:var(--fg-soft);font-weight:600}
+/* Plus de cascade par lien : une animation à `fill:both` et délai reste
+   FIGÉE sur son état initial (opacité 0) si le document ne rend pas de
+   frame à l'instant de l'ouverture — retour d'arrière-plan, reprise iOS —
+   et le tiroir s'ouvrait vide. Une transition de bloc ne peut pas rester
+   coincée : son état de repos est visible, l'état ouvert aussi. */
+.nav-drawer__body{opacity:0;transform:translateX(14px);
+  transition:opacity .3s var(--ease),transform .34s var(--ease-out)}
+.nav-drawer.is-open .nav-drawer__body{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  .nav-drawer__panel,.nav-drawer__scrim,.nav-drawer__body{transition:none}
+}
+
+/* ============================================================
+   NAVIGATION — état actif (page courante), neutre tous domaines
+   ============================================================ */
+.mm__link.is-active .mm__txt b{color:var(--fg)}
+.mm__link.is-active .mm__ico{box-shadow:0 0 0 2px var(--fg)}
+.mm__btn.is-active{color:var(--fg)}
+
+/* ============================================================
+   SECTION 12 — FOOTER (structure v2)
+   ============================================================ */
+.ft{background:var(--night);color:var(--night-fg);border-top:1px solid rgba(255,255,255,.1);
+  padding-inline:var(--gutter)}
+.ft__inner{max-width:var(--maxw);margin:0 auto;padding:clamp(2.6rem,5vw,3.6rem) 0 0}
+.ft__top{display:grid;grid-template-columns:1.4fr 1fr .8fr .8fr;gap:2rem;
+  padding-bottom:clamp(2rem,5vw,3rem);border-bottom:1px solid rgba(255,255,255,.12)}
+.ft__brand img{height:1.3rem;width:auto;margin-bottom:.9rem}
+.ft__brand p{color:var(--night-muted);font-size:.92rem;font-weight:400;max-width:28ch}
+.ft__contact{margin-top:1rem;display:flex;flex-direction:column;gap:.3rem;font-size:.9rem}
+.ft__contact a{font-weight:600;color:#D4D4D8;transition:color .2s}
+.ft__contact a:hover{color:#fff}
+.ft__contact span{color:var(--night-muted);font-weight:400}
+.ft__badges{margin-top:1rem;display:flex;gap:.5rem}
+.ft__badges span{font-size:.62rem;font-weight:600;
+  letter-spacing:.08em;padding:.3rem .7rem;border:1px solid rgba(255,255,255,.2);
+  border-radius:99px;color:var(--night-muted)}
+.ft__col h3{font-size:.66rem;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--night-muted);margin-bottom:.9rem}
+.ft__col ul{display:flex;flex-direction:column;gap:.5rem}
+.ft__col a{color:#D4D4D8;font-size:.9rem;font-weight:400;transition:color .2s}
+@media (hover:hover) and (pointer:fine){.ft__col a:hover,.ft__geo a:hover,.ft__meta a:hover{color:#fff}}
+/* DORMANT — le strip géo a été retiré des 34 pages le 2026-08-04, le temps
+   que les 16 pages géo sortent de l'index. Ces règles ne ciblent donc plus
+   rien : c'est voulu, pas un oubli. Elles sont conservées pour que le
+   rétablissement du strip reste une opération purement HTML.
+   cssaudit.py les signalera comme mortes — c'est attendu. */
+.ft__geo{padding:1.2rem 0;border-bottom:1px solid rgba(255,255,255,.12);
+  display:flex;flex-wrap:wrap;gap:.2rem .6rem;font-size:.78rem;color:var(--night-muted)}
+.ft__geo a{color:var(--night-muted);font-weight:400;transition:color .2s}
+.ft__geo .dot{opacity:.4}
+.ft__meta{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;
+  padding:1.2rem 0;font-size:.82rem;color:var(--night-muted)}
+.ft__meta nav{display:flex;gap:1.1rem;flex-wrap:wrap}
+.ft__meta nav a{color:var(--night-muted);transition:color .2s}
+/* Filet de pied de page : un cheveu neutre qui ferme la colonne, plus le
+   bandeau arc-en-ciel de 3px qui signait le site sans rien signifier. */
+.ft__filet{height:1px;background:rgba(255,255,255,.14)}
+.ft :focus-visible{outline-color:#fff}
+@media (max-width:960px){
+  /* Palier intermédiaire : entre 861 et 960px, les deux colonnes de liens en
+     .8fr tombaient à ~145px et « Community management » passait sur trois
+     lignes. On repasse à trois colonnes avant de descendre à deux. */
+  .ft__top{grid-template-columns:1.4fr 1fr 1fr}
+  .ft__col:last-child{grid-column:2/-1}
+}
+@media (max-width:860px){
+  .ft__top{grid-template-columns:1fr 1fr}
+  .ft__brand{grid-column:1/-1}
+  .ft__col:last-child{grid-column:auto}
+}
+@media (max-width:520px){.ft__top{grid-template-columns:1fr}}
+
+
+/* ============================================================
+   TABLEAU COMPARATIF — composant partagé
+   ============================================================
+   Il vivait dans le `<style>` de index.html, dans sa version aboutie, et
+   creation-site-web.html en gardait une version anterieure : meme balisage,
+   dessin different — colonne noire sans son encastrement, criteres sans
+   picto, filet vert en travers de l en-tete. Deux dessins pour un meme
+   composant, c est un composant qui a divergé.
+
+   Il rejoint donc `.cta` et `.faq`, les autres sections partagees de cette
+   feuille. Le fond de section passe par `--cmp-fond` : c est la SEULE chose
+   qui differait legitimement entre les deux pages (blanc sur l accueil,
+   canvas sur la page creation), et une variable suffit a la porter.
+   ============================================================ */
+.cmp{background:var(--cmp-fond,var(--bg));padding:var(--section-y) var(--gutter)}
+.cmp__inner{max-width:var(--maxw);margin:0 auto}
+/* `overflow:hidden` retiré du tableau : il rognait l'ombre portée de la colonne
+   noire, qui doit déborder pour la faire paraître posée au-dessus du reste.
+   Ce sont désormais les cellules qui portent leurs propres arrondis. */
+/* Largeurs fixées : en répartition automatique, la colonne Digistylze — la plus
+   courte en nombre de caractères — sortait la plus étroite des quatre, ce qui
+   est exactement l'inverse de ce qu'elle doit dire. Elle est maintenant la plus
+   large, et ses libellés tiennent sur une ligne. */
+.cmp-table{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0;
+  background:var(--bg)}
+.cmp-table th:first-child{width:17%}
+.cmp-table th.col--us{width:31%}
+.cmp-table th:nth-child(3),.cmp-table th:nth-child(4){width:26%}
+/* LE PLATEAU — la colonne n'est plus posée à plat, elle est encastrée.
+   Il se cale sur la bande exacte de la colonne : `table-layout:fixed` avec des
+   pourcentages déclarés rend la géométrie déterministe (17% pour la colonne
+   critère, puis 31% pour la nôtre). Sans largeurs fixées ce calcul serait faux
+   au premier changement de contenu — les deux règles vont ensemble. */
+/* Le plateau clair qui encadrait la colonne noire est retiré. Il était
+   géométriquement juste — 9px sur les quatre côtés, mesurés — mais il ne se
+   lisait pas comme un encastrement : sur un fond blanc, une plaque à peine plus
+   grise qui dépasse d'une colonne noire se lit comme un défaut de rendu, pas
+   comme une intention. Bastien l'a signalé deux fois.
+
+   La colonne tient donc seule, par son ombre. Bénéfice de côté : plus de calcul
+   en pourcentage adossé à `table-layout:fixed` — c'était le point le plus
+   fragile du bloc, faux au premier changement de largeur de colonne. */
+.cmp-frame{position:relative}
+.cmp-table{position:relative;z-index:1}
+.cmp-table th,.cmp-table td{padding:1.5rem 1.2rem;text-align:center;font-size:.9rem;
+  border-bottom:1px solid var(--line-soft)}
+.cmp-table thead th{font-size:.66rem;font-weight:600;padding-bottom:.9rem;
+  color:var(--muted);text-transform:uppercase;letter-spacing:.1em;
+  border-bottom:1px solid var(--line)}
+.cmp-table tbody tr:last-child td{border-bottom:0}
+.cmp-table th:first-child,.cmp-table td:first-child{text-align:left;
+  font-size:.72rem;font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--fg)}
+/* Le picto de critère rend le tableau lisible en diagonale : on repère sa ligne
+   à la forme avant de lire le mot. */
+/* Cette cellule était en `display:flex` : elle cessait alors d'être une cellule
+   de tableau, gardait la hauteur de son contenu (69 px) au lieu de suivre celle
+   de sa ligne, et sa bordure basse se dessinait donc trop haut — jusqu'à 26 px
+   d'écart sur les lignes où le texte des colonnes voisines passe à deux lignes.
+   D'où les traits horizontaux décalés en bas du tableau. En cellule normale la
+   bordure retombe sur celle des voisines, et le picto reste centré : il est en
+   `inline-flex` avec son propre `vertical-align`, le flex ne servait à rien. */
+.cmp-table td:first-child{vertical-align:middle}
+/* L'écart passe par une marge et non par le `gap` du flex : sous 640px la
+   cellule repasse en `display:block` pour la bascule en cartes, et le gap
+   disparaîtrait avec le flex — le picto se collait au mot. */
+.cmp-crit[data-picto]{margin:0 .5rem 0 0;vertical-align:-.24em;
+  --picto-taille:1.05rem;color:var(--muted);flex:none}
+
+/* COCHES ET CROIX — le verdict se lit avant le mot.
+   Chaque cellule ouvre sur une pastille : coche verte côté Digistylze,
+   croix côté concurrence. Le texte reste — une coche seule ne dit pas
+   POURQUOI — mais il passe en précision sous le verdict. */
+.cmp-mark{display:inline-flex;align-items:center;justify-content:center;
+  width:1.75rem;height:1.75rem;border-radius:50%;flex:none;margin-bottom:.5rem}
+.cmp-mark svg{width:.95rem;height:.95rem;fill:none;stroke:currentColor;
+  stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}
+.cmp-mark--yes{background:rgba(47,166,106,.14);color:var(--success)}
+/* Sur la colonne noire, le vert monte d'un cran pour rester lisible. */
+.col--us .cmp-mark--yes{background:rgba(76,195,138,.16);color:#4CC38A;
+  box-shadow:inset 0 0 0 1px rgba(76,195,138,.35)}
+.cmp-mark--no{background:rgba(184,62,59,.08);color:#C4453F;opacity:.75}
+.cmp-val{display:block}
+/* Le logo remplace le mot « Digistylze » en tête de colonne. Blanc sur la
+   colonne noire, hauteur calée sur la hauteur d'x des en-têtes voisins. */
+.cmp-logo{display:block;height:1.05rem;width:auto;margin:0 auto}
+
+/* LA COLONNE DIGISTYLZE EST D'UN SEUL TENANT — c'est tout le sujet du bloc.
+   Avant, `.cmp-table thead th` (spécificité 0,1,2) écrasait le fond de
+   `.col--us` (0,1,0) : la cellule d'en-tête restait grise pendant que
+   `.col--us-h` forçait son texte en blanc. Blanc sur gris clair, « DIGISTYLZE »
+   était illisible, et la colonne semblait commencer SOUS son propre en-tête.
+   D'où le sélecteur `thead th.col--us`, à spécificité au moins égale. */
+/* L'ombre est portée par CHAQUE cellule de la colonne. Les cellules sont
+   contiguës et opaques : chacune masque l'ombre de sa voisine, et seule la
+   silhouette extérieure de la colonne se dessine. Une seule déclaration de
+   `box-shadow` par règle — c'est une deuxième déclaration, ajoutée plus bas,
+   qui avait silencieusement réintroduit le filet vert au lot précédent. */
+.col--us{background:var(--fg);color:#fff!important;position:relative;
+  font-weight:500;font-size:1rem;padding-top:1.75rem;padding-bottom:1.75rem;
+  box-shadow:0 14px 34px -18px rgba(20,20,24,.5)}
+.cmp-table thead th.col--us{background:var(--fg);color:#fff;
+  border-radius:1.1rem 1.1rem 0 0;border-bottom:0;
+  padding-top:1.5rem;padding-bottom:1.2rem;
+  /* Le filet vert est retiré : c'était la seule couleur de la section et elle
+     ne disait rien. Un filet de lumière interne coiffe la colonne à sa place —
+     il dit « pièce usinée » sans importer une teinte étrangère à l'identité. */
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 14px 34px -18px rgba(20,20,24,.5)}
+.cmp-table tbody tr:last-child td.col--us{border-radius:0 0 1.1rem 1.1rem}
+/* Le filet clair du corps de tableau, tiré sous une cellule noire, dessinait
+   une coupure blanche en travers de la colonne : elle se lisait en cellules
+   empilées et non en colonne. On repasse le séparateur en blanc très dilué —
+   il continue de scander les lignes, sans casser le bloc. */
+.cmp-table td.col--us{border-bottom-color:rgba(255,255,255,.11)}
+.col--us-h{font-weight:700;text-transform:none;letter-spacing:0;font-size:.92rem}
+/* Les deux colonnes concurrentes reculent d'un cran : c'est ce qui manquait
+   pour hiérarchiser. Quatre colonnes de poids égal, tout centré, ne disent pas
+   au regard où aller — alors que la section n'a qu'un seul message. */
+.cmp-other{color:var(--muted);font-weight:400;font-size:.85rem;opacity:.82}
+.cmp-table tbody td{transition:background .3s var(--ease-out),opacity .3s var(--ease-out)}
+@media (hover:hover) and (pointer:fine){
+  .cmp-table tbody tr:hover td{background:var(--canvas)}
+  .cmp-table tbody tr:hover td.col--us{background:#22252d}
+  .cmp-table tbody tr:hover .cmp-other{opacity:1}
+  /* Le picto glisse : la ligne survolée se signale par un mouvement, pas
+     seulement par un aplat qui change. */
+  .cmp-table tbody tr:hover .cmp-crit{transform:translateX(2px);color:var(--fg)}
+}
+.cmp-crit[data-picto]{transition:transform .3s var(--ease-out),color .3s var(--ease-out)}
+/* Entrée étagée en OPACITÉ ET FLOU SEULEMENT — surtout pas en translation.
+   Une translation sur les <tr> décrochait visiblement la colonne noire de son
+   plateau pendant toute la durée du reveal : le plateau est un pseudo-élément
+   de .cmp-frame, il ne suit pas les lignes. Le mouvement vertical existe déjà,
+   porté par le .wf-rev de .cmp-frame, qui déplace le bloc ENTIER, plateau
+   compris. (Transformer un <tr> est de toute façon mal spécifié : le
+   navigateur promeut la ligne et la géométrie du tableau peut casser.)
+   --ease-out du site est déjà une courbe à ressort (.16,1,.3,1). */
+.wf-js tbody tr.wf-rev-row{opacity:0;filter:blur(6px);
+  transition:opacity .7s var(--ease-out),filter .7s var(--ease-out);
+  transition-delay:var(--d,0s)}
+.wf-js tbody tr.wf-rev-row.is-in{opacity:1;filter:none}
+/* La règle globale de site.css coupe les ANIMATIONS, pas les transitions
+   bloquées à opacity:0. Sans cette ligne, les six lignes resteraient invisibles
+   et floues en mouvement réduit — c'est le piège de ce bloc. */
+@media (prefers-reduced-motion:reduce){
+  .wf-js tbody tr.wf-rev-row{opacity:1!important;filter:none!important}
+}
+@media (max-width:640px){
+  .cmp-table{box-shadow:none;background:transparent;border:0;border-radius:0}
+  .cmp-table thead{display:none}
+  .cmp-table,.cmp-table tbody{display:block;width:100%}
+  .cmp-table tr{display:block;background:var(--bg);border-radius:.8rem;margin-bottom:.8rem;
+    padding:.3rem 1rem;box-shadow:var(--shadow-md);border:1px solid var(--line)}
+  .cmp-table td{display:flex;align-items:center;justify-content:space-between;gap:1rem;
+    padding:.75rem 0;font-size:.9rem;text-align:right;border-bottom:1px solid var(--line)}
+  .cmp-table tr td:last-child{border-bottom:0}
+  .cmp-table tr td:first-child{display:block;text-align:left;
+    padding:.85rem 0 .7rem;border-bottom:1px solid var(--line)}
+  .cmp-table tr td:nth-child(2)::before{content:"Digistylze"}
+  .cmp-table tr td:nth-child(3)::before{content:"Agences classiques"}
+  .cmp-table tr td:nth-child(4)::before{content:"Freelance"}
+  .cmp-table tr td:nth-child(n+2)::before{font-size:.64rem;
+    font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;flex-shrink:0}
+  .cmp-table tr td.col--us{margin:.4rem -1rem;padding:.85rem 1rem;
+    background:var(--fg);color:#fff!important;border-bottom:1px solid rgba(255,255,255,.12)}
+  .cmp-table tr td.col--us::before{color:rgba(255,255,255,.7)}
+  /* En cartes, le verdict repasse en ligne : pastille réduite, calée sur le
+     texte. L'étiquette pousse la paire pastille+texte à droite par sa marge
+     auto — avec trois enfants, space-between seul écartèlerait la pastille
+     au milieu de la ligne. */
+  .cmp-table tr td:nth-child(n+2)::before{margin-right:auto}
+  .cmp-mark{width:1.2rem;height:1.2rem;margin:0}
+  .cmp-mark svg{width:.7rem;height:.7rem}
+  .cmp-val{display:inline}
+  .cmp-logo{margin:0;height:.95rem}
+}
+
+/* ============================================================
+   WIDGET FLOTTANT — floating-whatsapp (mutualisé)
+   ============================================================ */
+.float-widget{position:fixed;bottom:1.5rem;right:1.5rem;z-index:60;
+  display:flex;align-items:center;gap:.75rem;
+  opacity:0;transform:translateY(20px);pointer-events:none;
+  transition:opacity .35s var(--ease),transform .35s var(--ease-out)}
+.float-widget.is-visible{opacity:1;transform:translateY(0);pointer-events:auto}
+.float-btn{display:inline-flex;align-items:center;justify-content:center;cursor:pointer;border:0;
+  transition:background .2s var(--ease),transform .2s var(--ease-out)}
+.float-wa{width:3.25rem;height:3.25rem;border-radius:50%;background:#25D366;color:#fff;
+  box-shadow:0 8px 20px -6px rgba(37,211,102,.55),0 4px 10px rgba(0,0,0,.18)}
+.float-wa svg{width:1.5rem;height:1.5rem}
+.float-wa:hover{background:#1EBE5B;transform:translateY(-2px)}
+.float-devis{gap:.55rem;padding:14px 22px;border-radius:999px;background:var(--fg);color:#fff;
+  font-weight:600;font-size:.9rem;
+  box-shadow:0 12px 28px -8px rgba(20,20,24,.55),0 4px 12px rgba(0,0,0,.18)}
+.float-devis svg{width:1rem;height:1rem;fill:none;stroke:currentColor;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round}
+.float-devis:hover{background:#000;transform:translateY(-2px)}
+@media (max-width:640px){
+  .float-widget{bottom:1rem;right:1rem;gap:.5rem}
+  .float-devis{padding:14px}
+  .float-devis__text{display:none}
+  .float-devis svg{width:1.25rem;height:1.25rem}
+  .float-wa{width:3rem;height:3rem}
+  .float-wa svg{width:1.35rem;height:1.35rem}
+}
+.fw-modal{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:1rem}
+.fw-modal.is-open{display:flex}
+.fw-modal__backdrop{position:absolute;inset:0;background:rgba(0,0,0,.6);
+  backdrop-filter:blur(4px);animation:fwFade .25s var(--ease) both}
+.fw-modal__dialog{position:relative;z-index:1;width:100%;max-width:560px;
+  max-height:calc(100dvh - 2rem);overflow-y:auto;background:var(--bg);
+  border-radius:16px;padding:2rem;box-shadow:0 30px 60px -20px rgba(0,0,0,.4);
+  animation:fwRise .35s var(--ease-out) both}
+@keyframes fwFade{from{opacity:0}to{opacity:1}}
+@keyframes fwRise{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+.fw-modal__close{position:absolute;top:.85rem;right:.85rem;width:2.75rem;height:2.75rem;
+  border-radius:50%;background:var(--canvas-2);border:0;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;color:var(--fg);
+  transition:background .2s var(--ease)}
+.fw-modal__close:hover{background:var(--line)}
+.fw-modal__close svg{width:1rem;height:1rem;fill:none;stroke:currentColor;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round}
+.fw-modal__eyebrow{font-size:.72rem;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--fg-soft);margin-bottom:.65rem}
+.fw-modal__title{font-size:clamp(1.35rem,2.5vw,1.75rem);font-weight:600;
+  letter-spacing:-.02em;line-height:1.15;margin-bottom:.5rem;color:var(--fg)}
+.fw-modal__sub{font-size:.92rem;color:var(--muted);line-height:1.55;margin-bottom:1.5rem}
+.fw-form{display:flex;flex-direction:column;gap:1rem}
+.fw-form__row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+@media (max-width:640px){.fw-form__row{grid-template-columns:1fr}}
+.fw-form__group{display:flex;flex-direction:column;gap:.35rem}
+.fw-form__label{font-size:.82rem;font-weight:600;color:var(--fg)}
+.fw-form__input,.fw-form__textarea{width:100%;min-width:0;padding:.8rem 1rem;
+  border-radius:8px;background:var(--bg);border:1px solid var(--line);color:var(--fg);
+  transition:border-color .2s var(--ease),box-shadow .2s var(--ease)}
+.fw-form__input:focus,.fw-form__textarea:focus{outline:none;border-color:var(--fg);
+  box-shadow:0 0 0 3px rgba(20,20,24,.12)}
+.fw-form__textarea{resize:vertical;min-height:7rem}
+.fw-form__btn{align-self:flex-start;padding:14px 22px;border-radius:var(--radius-pill);
+  background:var(--fg);color:#fff;border:0;font-weight:600;font-size:.92rem;cursor:pointer;
+  display:inline-flex;align-items:center;gap:.5rem;
+  transition:background .2s var(--ease),transform .2s var(--ease-out)}
+.fw-form__btn:hover{background:#000;transform:translateY(-1px)}
+.fw-form__btn svg{width:1rem;height:1rem;fill:none;stroke:currentColor;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round}
+.fw-form__note{font-size:.75rem;color:var(--muted)}
+.fw-form__success{display:none;padding:1rem 1.2rem;background:#EDF8F1;border:1px solid #BFE5CE;
+  border-radius:.55rem;color:#1E6B44;font-weight:500;font-size:.92rem}
+.fw-form.is-sent .fw-form__success{display:block}
+.fw-form.is-sent .fw-form__row,.fw-form.is-sent .fw-form__group,
+.fw-form.is-sent .fw-form__btn,.fw-form.is-sent .fw-form__note{display:none}
+/* `overflow:hidden` seul ne verrouille pas le défilement sur iOS Safari : la
+   page continue de bouger sous la modale. Le verrou réel est un position:fixed,
+   posé par DTZ.lock() qui mémorise et restitue le scrollY. */
+body.is-locked{position:fixed;width:100%;overflow:hidden}
+
+/* ============================================================
+   CADRE NAVIGATEUR / TÉLÉPHONE — .shot / .phone-frame
+   ============================================================ */
+.shot{border-radius:.8rem;overflow:hidden;
+  border:1px solid var(--line);background:var(--canvas-2);box-shadow:var(--shadow-md);
+  transition:transform .3s var(--ease-out),box-shadow .3s var(--ease-out)}
+.shot:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.shot__bar{display:flex;gap:.28rem;padding:.5rem .7rem;background:var(--canvas);
+  border-bottom:1px solid var(--line-soft)}
+.shot__bar i{width:.5rem;height:.5rem;border-radius:50%;background:var(--line)}
+.shot img{width:100%;aspect-ratio:1280/900;object-fit:cover;object-position:top}
+.phone-frame{border-radius:1.1rem;overflow:hidden;border:4px solid var(--fg);
+  background:var(--fg);box-shadow:var(--shadow-lg)}
+.phone-frame img{width:100%;aspect-ratio:9/17;object-fit:cover;object-position:top}
+
+
+/* ============================================================
+   .stamp — ÉTIQUETTE D'HONNÊTETÉ (primitive)
+   Obligatoire sur tout composant qui met en scène de la donnée
+   (tableau de bord, courbe, SERP, ciblage, réponse d'IA).
+   Dit au visiteur ce qu'il regarde : une illustration conçue par
+   nous, jamais une capture d'écran. Lisible sur fond clair et sur
+   fond --night.
+   ============================================================ */
+.stamp{display:inline-flex;align-items:center;gap:.4rem;
+  font-size:.58rem;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);border:1px solid var(--line);
+  border-radius:var(--radius-pill);padding:.28rem .7rem}
+.stamp svg{width:.7rem;height:.7rem;fill:none;stroke:currentColor;
+  stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.stamp--night{color:var(--night-muted);border-color:rgba(255,255,255,.18)}
+
+/* ============================================================
+   .slot — EMPLACEMENT EN ATTENTE D'UN VISUEL CLIENT (primitive)
+   Cadre éditorial assumé, jamais une image cassée. Indique
+   précisément l'attendu pour que le client sache quoi fournir.
+   ============================================================ */
+.slot{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:.6rem;text-align:center;padding:clamp(1.5rem,4vw,2.5rem);
+  background:var(--canvas);border:1px dashed var(--line);
+  border-radius:var(--radius-lg);color:var(--muted)}
+.slot svg{width:1.6rem;height:1.6rem;fill:none;stroke:currentColor;
+  stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;opacity:.7}
+.slot__label{font-size:.62rem;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--fg-soft)}
+.slot__hint{font-size:.8rem;font-weight:400;line-height:1.5;max-width:26ch}
+
+
+/* ============================================================
+   CADRE NAVIGATEUR — .exp-frame
+   Mockup de site client présenté dans une fenêtre stylisée.
+   Monté ici le 2026-08-04 : utilisé par index + les 16 pages géo,
+   il était dupliqué dans les 17 <style> correspondants.
+   ============================================================ */
+.exp-frame{border-radius:.8rem;overflow:hidden;border:1px solid var(--line);
+  background:var(--canvas-2);box-shadow:var(--shadow-lg)}
+.exp-frame__bar{display:flex;gap:.28rem;padding:.5rem .7rem;background:var(--canvas);
+  border-bottom:1px solid var(--line-soft)}
+.exp-frame__bar i{width:.5rem;height:.5rem;border-radius:50%;background:var(--line)}
+.exp-frame img{width:100%;aspect-ratio:1280/860;object-fit:cover;object-position:top}
+
+/* ============================================================
+   ANIMATION PARTAGÉE
+   ============================================================ */
+@keyframes fxRise{from{opacity:0;transform:translateY(60px)}to{opacity:1;transform:translateY(0)}}
+
+/* ============================================================
+   SECTIONS PARTAGÉES — FAQ + CTA FINAL + FORMULAIRE
+   Ce bloc terminait 29 des 34 pages, recopié mot pour mot.
+   Monté ici le 2026-08-04 : c'est désormais la source unique.
+   Toute retouche du CTA ou de la FAQ se fait ICI, une seule fois.
+   ============================================================ */
+/* ============================================================
+   SECTION 10 — FAQ — faq-objections (8 questions)
+   ============================================================ */
+.faq{background:var(--canvas);padding:var(--section-y) var(--gutter)}
+.faq__inner{max-width:var(--maxw-col);margin:0 auto}
+.faq__list{display:flex;flex-direction:column;gap:.9rem}
+.faq-qa{background:var(--bg);border:1px solid var(--line);border-radius:.7rem;overflow:hidden;
+  transition:border-color .25s ease}
+.faq-qa:hover{border-color:var(--muted)}
+.faq-qa[open]{border-color:var(--fg)}
+.faq-qa__q{padding:1.05rem 1.3rem;display:flex;align-items:flex-start;gap:.8rem;
+  font-size:1rem;font-weight:600;letter-spacing:-.005em}
+.faq-qa__q > span:first-child{flex:1;min-width:0;line-height:1.4}
+.faq-qa__icon{width:1.6rem;height:1.6rem;flex-shrink:0;border-radius:50%;
+  border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;
+  color:var(--muted);margin-top:.05rem;
+  transition:transform .35s ease,background .25s ease,border-color .25s ease,color .25s ease}
+.faq-qa__icon svg{width:.9rem;height:.9rem;fill:none;stroke:currentColor;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round}
+.faq-qa[open] .faq-qa__icon{transform:rotate(45deg);background:var(--fg);border-color:var(--fg);color:#fff}
+.faq-qa__a{padding:0 1.3rem 1.15rem;color:var(--fg-soft);font-size:.94rem;line-height:1.6;font-weight:400}
+.faq-qa__a p+p{margin-top:.7rem}
+.faq-qa__a b{font-weight:600;color:var(--fg)}
+.faq-qa__a a{font-weight:600;color:var(--fg);text-decoration:underline;text-underline-offset:3px}
+
+/* ============================================================
+   SECTION 11 — CTA FINAL — cta-band + formulaire
+   ============================================================ */
+.cta{background:var(--night);color:var(--night-fg);padding:var(--section-y) var(--gutter)}
+.cta__inner{max-width:var(--maxw);margin:0 auto;display:grid;grid-template-columns:1fr 1fr;
+  gap:clamp(2rem,5vw,4rem);align-items:center}
+.cta__title{font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;
+  letter-spacing:-.03em;line-height:1.02;color:#fff}
+/* Le titre reste d'une seule graisse, comme les h2 de la v2. La seconde ligne
+   ne se détachait que par un 300 qui cassait la ligne en deux poids ; c'est
+   l'écart de couleur et de graisse que Bastien a signalé. */
+.cta__title .grad{font-weight:inherit}
+.cta__sub{margin-top:1rem;color:var(--night-muted);font-weight:400;line-height:1.65}
+.cta__wa{margin-top:1.5rem;display:inline-flex;align-items:center;gap:.55rem;
+  padding:.85rem 1.5rem;border-radius:var(--radius-pill);background:#25D366;color:#fff;
+  font-weight:600;font-size:.92rem;transition:background .2s,transform .2s var(--ease-out)}
+.cta__wa:hover{background:#1EBE5B;transform:translateY(-2px)}
+.cta__wa svg{width:1.1rem;height:1.1rem;fill:currentColor}
+.cta__slots{margin-top:1rem;font-size:.8rem;color:var(--night-muted);font-weight:400}
+.cta__slots b{color:#fff;font-weight:600}
+.cta-form{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);
+  border-radius:1.2rem;padding:clamp(1.4rem,3vw,2rem);
+  display:flex;flex-direction:column;gap:.9rem;
+  backdrop-filter:blur(10px)}
+.cta-form .form__label{color:var(--night-fg)}
+.form__group{display:flex;flex-direction:column;gap:.4rem}
+.form__label{font-size:.85rem;font-weight:500}
+.cta-form .form__input,.cta-form .form__select,.cta-form .form__textarea{
+  width:100%;min-width:0;padding:.8rem 1rem;border-radius:.55rem;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);color:#fff;
+  transition:border-color .25s var(--ease-out),box-shadow .25s var(--ease-out)}
+.cta-form .form__input::placeholder,.cta-form .form__textarea::placeholder{color:rgba(255,255,255,.45)}
+.cta-form select option{color:var(--fg);background:#fff}
+.cta-form .form__input:focus,.cta-form .form__select:focus,.cta-form .form__textarea:focus{
+  outline:none;border-color:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.15)}
+.cta-form .form__textarea{resize:vertical;min-height:6rem}
+.cta-form .form__btn{margin-top:.2rem;padding:.95rem 1.2rem;border-radius:var(--radius-pill);
+  background:#fff;color:var(--fg);border:0;font-weight:600;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
+  transition:transform .2s var(--ease-out),background .2s}
+.cta-form .form__btn:hover{transform:translateY(-1px);background:var(--canvas-2)}
+.cta-form .form__btn svg{width:1rem;height:1rem;fill:none;stroke:currentColor;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round}
+.cta-form .microcopy{color:var(--night-muted);text-align:center}
+.form__success{display:none;padding:1rem 1.2rem;background:rgba(47,166,106,.15);
+  border:1px solid rgba(47,166,106,.4);border-radius:.55rem;color:#9ADFB6;
+  font-weight:500;font-size:.95rem}
+.cta-form.is-sent .form__success{display:block}
+.cta-form.is-sent .form__group,.cta-form.is-sent .form__btn,.cta-form.is-sent .microcopy{display:none}
+.hp-field{position:absolute;left:-9999px;opacity:0;height:0;overflow:hidden}
+.cta :focus-visible{outline-color:#fff}
+@media (max-width:860px){.cta__inner{grid-template-columns:1fr}}
+
+/* ============================================================
+   HABILLAGES DE FAQ — casser les 29 fins de page identiques
+
+   La FAQ terminait 29 pages sur 34 avec exactement le même
+   accordéon. Le contenu ne bouge pas — même <details>/<summary>,
+   même FAQPage en JSON-LD — seule la mise en forme change, par
+   une classe posée sur la <section>.
+
+   L'accordéon par défaut (.faq sans modificateur) reste, mais
+   rationné : deux ou trois pages, pas vingt-neuf.
+   ============================================================ */
+
+/* — F2 · éditorial : titre collant à gauche, tout ouvert à droite.
+     Pour les pages qu'on balaye plutôt qu'on n'interroge. — */
+.faq--editorial .faq__inner{max-width:var(--maxw);display:grid;
+  grid-template-columns:minmax(0,34fr) minmax(0,66fr);
+  gap:clamp(2.5rem,6vw,5rem);align-items:start}
+.faq--editorial .section-head{text-align:left;margin:0;max-width:none;
+  position:sticky;top:calc(4.2rem + 2rem)}
+.faq--editorial .faq__list{display:block}
+.faq--editorial .faq-qa{background:none;border:0;border-top:1px solid var(--line);
+  border-radius:0;padding:0}
+.faq--editorial .faq-qa:first-child{border-top:0}
+/* Tout est déplié : le marqueur « + » n'a plus de sens, et le résumé
+   redevient un simple titre de niveau. */
+.faq--editorial .faq-qa__q{padding:1.3rem 0 .4rem;cursor:default;font-size:1rem}
+.faq--editorial .faq-qa__icon{display:none}
+.faq--editorial .faq-qa__a{padding:0 0 1.3rem;max-width:60ch}
+@media (max-width:1120px){
+  .faq--editorial .faq__inner{grid-template-columns:minmax(0,1fr)}
+  .faq--editorial .section-head{position:static;margin-bottom:1.5rem}
+}
+
+/* — F3 · transcription : la question est une bulle, la réponse un filet.
+     Pour les pages où le visiteur pose des questions avant d'acheter. — */
+.faq--thread .faq__inner{max-width:var(--maxw-col)}
+.faq--thread .faq__list{display:flex;flex-direction:column;gap:1.7rem}
+.faq--thread .faq-qa{background:none;border:0;border-radius:0;padding:0}
+.faq--thread .faq-qa__q{margin-left:auto;width:fit-content;max-width:34ch;
+  background:var(--canvas-2);border-radius:20px 20px 4px 20px;
+  padding:.85rem 1.15rem;font-size:.95rem;line-height:1.4;display:block}
+.faq--thread .faq-qa__icon{display:none}
+.faq--thread .faq-qa__a{margin-top:1rem;padding:0 0 0 1rem;
+  border-left:2px solid var(--fg)}
+.faq--thread .faq-qa__a::before{content:"Réponse · Digistylze";display:block;
+  margin-bottom:.4rem;font-size:.6rem;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+@media (max-width:720px){.faq--thread .faq-qa__q{max-width:88%}}
+
+/* — F5 · tableau : les questions factuelles se lisent plus vite en lignes
+     qu'en accordéon. Pour les pages de prix et de chiffres. — */
+.faq--table .faq__inner{max-width:var(--maxw-col)}
+.faq--table .faq__list{border-top:1px solid var(--line)}
+.faq--table .faq-qa{background:none;border:0;border-radius:0;padding:0;
+  border-bottom:1px solid var(--line);display:grid;
+  grid-template-columns:minmax(0,38fr) minmax(0,62fr);gap:1.5rem;
+  padding:1.2rem 0;align-items:start}
+.faq--table .faq-qa__q{padding:0;cursor:default;font-size:.95rem;font-weight:600;display:block}
+.faq--table .faq-qa__icon{display:none}
+.faq--table .faq-qa__a{padding:0;font-size:.92rem}
+@media (max-width:720px){
+  .faq--table .faq-qa{grid-template-columns:minmax(0,1fr);gap:.5rem}
+}
+
+/* ================================================================
+   COMPOSANTS 2026-08-07 — refonte des retours client
+   ================================================================
+   Quatre composants nouveaux, sous des noms nouveaux : les pages géo
+   (gelées) consomment `.faq-qa`, `.rv-card` et leurs familles — on ne
+   touche à rien d'existant, on AJOUTE. Périmètre : les 16 pages cœur.
+   ================================================================ */
+
+/* petit format du CTA pilule, pour les cartes et fins de section */
+.btn-pill--sm{padding:.68rem 1.25rem;font-size:.88rem}
+
+/* grain — matière discrète pour les sections noires. Un calque de bruit
+   SVG à 4% : casse l'aplat numérique sans se voir comme un motif. */
+.grain{position:relative}
+.grain::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E")}
+.grain > *{position:relative;z-index:1}
+
+/* ============================================================
+   FAQ V2 — .faq--v2 · accordéon FERMÉ par défaut
+   ============================================================
+   Deux colonnes : l'en-tête et une carte d'aide collent à gauche,
+   les questions s'ouvrent à droite, une à la fois sous le doigt.
+   L'animation d'ouverture est posée par site.js (hauteur mesurée) ;
+   sans JS, <details> ouvre et ferme nativement — rien ne se perd.
+   ============================================================ */
+.faq--v2 .fq__inner{max-width:var(--maxw);margin:0 auto;display:grid;
+  grid-template-columns:minmax(0,37fr) minmax(0,63fr);
+  gap:clamp(2.2rem,5vw,4.5rem);align-items:start}
+.faq--v2 .section-head{text-align:left;margin:0 0 1.6rem;max-width:none}
+.faq--v2 .section-head p{margin-inline:0}
+.fq__side{position:sticky;top:calc(4.2rem + 1.6rem)}
+/* La carte d'aide occupe le vide sous l'en-tête : un vrai chemin de sortie
+   pour qui n'a pas trouvé sa réponse, plutôt qu'un blanc. */
+.fq__card{background:var(--bg);border:1px solid var(--line);border-radius:1.1rem;
+  padding:1.5rem 1.5rem 1.6rem;box-shadow:var(--shadow-md)}
+.fq__card-ico{width:2.9rem;height:2.9rem;border-radius:.85rem;display:grid;
+  place-items:center;background:var(--fg);color:#fff;margin-bottom:.9rem}
+.fq__card-ico .picto{--picto-taille:1.3rem;margin:auto;vertical-align:0}
+.fq__card b{display:block;font-size:1.05rem;font-weight:600;letter-spacing:-.01em}
+.fq__card p{margin:.45rem 0 1.1rem;font-size:.88rem;color:var(--muted);
+  font-weight:400;line-height:1.55}
+.fq__list{display:flex;flex-direction:column;gap:.75rem}
+.fq-item{background:var(--bg);border:1px solid var(--line);border-radius:.95rem;
+  transition:border-color .25s var(--ease-out),box-shadow .25s var(--ease-out)}
+.fq-item:hover{border-color:var(--muted)}
+.fq-item[open]{border-color:var(--fg);box-shadow:var(--shadow-md)}
+.fq-item__q{display:flex;align-items:center;gap:.9rem;padding:1.1rem 1.2rem;
+  cursor:pointer;font-size:1rem;font-weight:600;letter-spacing:-.005em;
+  list-style:none;user-select:none}
+.fq-item__q::-webkit-details-marker{display:none}
+.fq-item__num{flex:none;font-size:.7rem;font-weight:600;color:var(--muted);
+  letter-spacing:.08em;font-variant-numeric:tabular-nums;
+  width:1.5rem;text-align:center}
+.fq-item[open] .fq-item__num{color:var(--fg)}
+.fq-item__txt{flex:1;min-width:0;line-height:1.4}
+.fq-item__ico{flex:none;width:1.85rem;height:1.85rem;border-radius:50%;
+  border:1px solid var(--line);display:inline-flex;align-items:center;
+  justify-content:center;color:var(--muted);
+  transition:transform .35s var(--ease-back),background .25s var(--ease-out),
+    border-color .25s var(--ease-out),color .25s var(--ease-out)}
+.fq-item__ico svg{width:.85rem;height:.85rem;fill:none;stroke:currentColor;
+  stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.fq-item[open] .fq-item__ico{transform:rotate(45deg);background:var(--fg);
+  border-color:var(--fg);color:#fff}
+/* Pendant la fermeture animée, l'attribut open est encore là (site.js ne le
+   retire qu'à hauteur zéro) : la classe fait répondre le cadre et l'icône
+   dès le clic. */
+.fq-item.is-closing{border-color:var(--line);box-shadow:none}
+.fq-item.is-closing .fq-item__ico{transform:none;background:transparent;
+  border-color:var(--line);color:var(--muted)}
+.fq-item.is-closing .fq-item__num{color:var(--muted)}
+/* Le conteneur de réponse est la pièce que site.js anime en hauteur.
+   `overflow:hidden` est structurel, pas décoratif. */
+.fq-item__a{overflow:hidden}
+.fq-item__b{padding:0 3.2rem 1.25rem 3.6rem;color:var(--fg-soft);
+  font-size:.94rem;line-height:1.6;font-weight:400}
+.fq-item__b p+p{margin-top:.7rem}
+.fq-item__b b{font-weight:600;color:var(--fg)}
+.fq-item__b a{font-weight:600;color:var(--fg);text-decoration:underline;
+  text-underline-offset:3px}
+@media (max-width:1120px){
+  .faq--v2 .fq__inner{grid-template-columns:minmax(0,1fr);gap:1.8rem}
+  /* Sur une colonne, la carte d'aide fermerait la route AVANT les questions :
+     `display:contents` dissout la colonne collante et l'ordre remet la carte
+     après la liste. */
+  .fq__side{display:contents}
+  .faq--v2 .section-head{order:0;margin-bottom:0}
+  .fq__list{order:1}
+  .fq__card{order:2;margin-top:.4rem}
+}
+@media (max-width:640px){
+  .fq-item__q{padding:.95rem 1rem;gap:.7rem}
+  .fq-item__b{padding:0 1rem 1.1rem 3.2rem}
+}
+
+/* ============================================================
+   AVIS GOOGLE — .gr · bandeau défilant en boucle
+   ============================================================
+   L'en-tête dit la note comme Google la dit — Excellent, cinq
+   étoiles, le G — et les avis défilent seuls, en boucle, pausables
+   au survol. Deux moitiés identiques dans la piste : la seconde est
+   décorative (aria-hidden), le -50% retombe pile sur la couture.
+   ============================================================ */
+.gr{background:var(--canvas);border-top:1px solid var(--line-soft);
+  padding:var(--section-y) var(--gutter);overflow:hidden}
+.gr__inner{max-width:var(--maxw);margin:0 auto}
+.gr-head{display:flex;flex-direction:column;align-items:center;gap:.5rem;
+  text-align:center}
+.gr-head__word{font-size:1.3rem;font-weight:700;letter-spacing:-.02em}
+.gr-stars{display:inline-flex;gap:.18rem;color:#FDB830}
+.gr-stars svg{width:1.35rem;height:1.35rem;fill:currentColor;display:block;
+  filter:drop-shadow(0 2px 4px rgba(253,184,48,.35))}
+.gr-head__note{font-size:.92rem;color:var(--muted);font-weight:400}
+.gr-head__note b{font-weight:600;color:var(--fg)}
+.gr-head__note a{color:inherit;text-decoration:underline;text-underline-offset:3px}
+.gr-head__brand{display:inline-flex;align-items:center;gap:.45rem;margin-top:.35rem;
+  font-size:.8rem;font-weight:500;color:var(--fg-soft);
+  border:1px solid var(--line);border-radius:99px;padding:.4rem .95rem;
+  background:var(--bg)}
+.gr-head__brand svg{width:1.05rem;height:1.05rem;display:block}
+/* Pleine largeur d'écran DANS une section à gouttière : même échappée que
+   .ar-marquee (compose.css) — la section garde le rail, le ruban s'étend. */
+.gr-marquee{--gap:1rem;width:100vw;margin-inline:calc(50% - 50vw);
+  margin-top:clamp(2rem,4.5vw,3rem);
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 7%,#000 93%,transparent);
+  mask-image:linear-gradient(to right,transparent,#000 7%,#000 93%,transparent)}
+/* 60s comme le data-fx-marquee des pages pilotées par fx.js : un avis se
+   lit, il ne se croise pas. La durée de secours suit la durée pilotée,
+   sinon le carrousel change d'allure selon que GSAP a chargé ou non. */
+.gr-track{display:flex;gap:var(--gap);width:max-content;padding-block:.35rem;
+  animation:grScroll 60s linear infinite}
+@media (hover:hover) and (pointer:fine){
+  .gr-marquee:hover .gr-track{animation-play-state:paused}
+}
+@keyframes grScroll{to{transform:translateX(calc(-50% - var(--gap)/2))}}
+.gr-card{width:clamp(16.5rem,24vw,21rem);flex:none;display:flex;
+  flex-direction:column;gap:.6rem;background:var(--bg);
+  border:1px solid var(--line);border-radius:1rem;padding:1.15rem 1.25rem;
+  box-shadow:0 2px 12px -8px rgba(20,20,24,.1);
+  transition:transform .3s var(--ease-out),box-shadow .3s var(--ease-out)}
+@media (hover:hover) and (pointer:fine){
+  .gr-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
+}
+.gr-card__head{display:flex;align-items:center;gap:.7rem}
+.gr-avatar{width:2.4rem;height:2.4rem;border-radius:50%;flex:none;
+  display:inline-flex;align-items:center;justify-content:center;
+  color:#fff;font-weight:600;font-size:.9rem}
+/* Les quatre teintes d'avatar des anciennes cartes d'avis : ce sont elles
+   qui disaient déjà « profil Google » sur tout le site. */
+.gr-avatar--a{background:#7466AD}
+.gr-avatar--b{background:#EA5753}
+.gr-avatar--c{background:#3F71B7}
+.gr-avatar--d{background:#2F8FA7}
+.gr-card__who{flex:1;min-width:0}
+.gr-card__name{font-size:.92rem;font-weight:600;line-height:1.2}
+.gr-card__src{font-size:.7rem;color:var(--muted);font-weight:400;margin-top:.1rem}
+/* Le G quadrichrome est le seul élément qui ne parle pas la palette du
+   site : c'est voulu, il dit « ceci vient de Google », rien d'autre. */
+.gr-card__g{flex:none;width:1.15rem;height:1.15rem}
+.gr-card__stars{display:inline-flex;gap:.12rem;color:#FDB830;margin-top:.1rem}
+.gr-card__stars svg{width:.82rem;height:.82rem;fill:currentColor;display:block}
+.gr-card__text{font-size:.88rem;line-height:1.55;color:var(--fg-soft);font-weight:400;
+  display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
+.gr__foot{margin-top:clamp(1.8rem,4vw,2.6rem);display:flex;flex-direction:column;
+  align-items:center;gap:.75rem;text-align:center}
+@media (prefers-reduced-motion:reduce){
+  /* La boucle s'arrête ; la piste redevient une rangée qu'on fait défiler
+     à la main. Le fondu de bord tomberait sur du contenu atteignable :
+     il saute aussi. */
+  .gr-track{animation:none}
+  .gr-marquee{overflow-x:auto;-webkit-mask-image:none;mask-image:none}
+}
+@media (max-width:640px){
+  .gr-card{width:min(78vw,19rem)}
+  .gr-track{animation-duration:44s}
+}
+
+/* ============================================================
+   STACK CARDS — .stack · étapes qui s'empilent au scroll
+   ============================================================
+   Chaque carte se colle sous l'en-tête à une hauteur qui augmente
+   d'un cran par étape : la suivante glisse par-dessus la précédente,
+   et le pied de section les montre empilées comme un jeu de fiches.
+   site.js ajoute le tassement (léger scale) des cartes recouvertes ;
+   sans JS, l'empilement sticky se suffit.
+   ============================================================ */
+.stack{display:grid;gap:clamp(1.1rem,2.6vw,1.7rem);
+  --stack-grad:linear-gradient(180deg,#3C3C45 0%,#141418 100%)}
+.stack-card{position:sticky;top:calc(4.2rem + 1.5rem + var(--i,0)*2.9rem);
+  display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1.5rem;
+  align-items:center;
+  /* Assez haute pour que chaque étape occupe l'écran et s'épingle un vrai
+     moment : c'est la hauteur qui fait le scrolltelling — quatre cartes
+     basses défilaient comme une liste. */
+  min-height:clamp(19rem,56vh,26rem);
+  background:var(--bg);border:1px solid var(--line);
+  border-radius:var(--radius-xl);
+  padding:clamp(1.5rem,3.4vw,2.4rem) clamp(1.3rem,3.4vw,2.8rem);
+  /* L'ombre porte AU-DESSUS de la carte : c'est elle qui détache la carte
+     de celle qu'elle recouvre. */
+  box-shadow:0 -14px 34px -26px rgba(20,20,24,.35),var(--shadow-lg);
+  transform-origin:top center;will-change:transform;
+  transition:filter .3s var(--ease-out)}
+/* Une respiration après la dernière carte : la pile complète reste
+   visible un instant avant que la section suivante n'arrive. */
+.stack{padding-bottom:clamp(2rem,7vh,4.5rem)}
+.stack-card:nth-child(even){background:var(--canvas)}
+.stack-card__head{display:flex;align-items:center;gap:.85rem;margin-bottom:1rem}
+.stack-card__ico{width:3rem;height:3rem;border-radius:.9rem;flex:none;
+  display:grid;place-items:center;color:#fff;background:var(--stack-grad);
+  box-shadow:var(--shadow-md)}
+.stack-card__ico .picto{--picto-taille:1.4rem;margin:auto;vertical-align:0}
+.stack-card__step{font-size:.7rem;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--muted)}
+.stack-card__title{font-size:clamp(1.3rem,2.6vw,1.75rem);font-weight:600;
+  letter-spacing:-.02em;line-height:1.15}
+.stack-card__when{display:inline-block;margin:.55rem 0 0;font-size:.74rem;
+  font-weight:600;letter-spacing:.04em;color:var(--fg-soft);
+  border:1px solid var(--line);border-radius:99px;padding:.28rem .8rem;
+  background:var(--bg)}
+.stack-card__desc{margin-top:.8rem;max-width:46ch;color:var(--muted);
+  font-weight:400;font-size:.98rem;line-height:1.6}
+/* Le grand ordinal est le décor de la carte : un chiffre fantôme à droite,
+   qui prend l'encre du dégradé quand sa carte est au sommet de la pile. */
+.stack-card__num{font-size:clamp(4.6rem,10vw,7.5rem);font-weight:700;
+  line-height:1;letter-spacing:-.04em;color:var(--canvas-2);
+  font-variant-numeric:tabular-nums;user-select:none;
+  transition:color .4s var(--ease-out)}
+.stack-card.is-front .stack-card__num{background:var(--stack-grad);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+@media (max-width:720px){
+  .stack-card{grid-template-columns:minmax(0,1fr);min-height:0;
+    top:calc(4.2rem + 1rem + var(--i,0)*2.1rem)}
+  .stack-card__num{position:absolute;right:1.1rem;top:.9rem;
+    font-size:3.2rem;opacity:.9}
+  .stack-card{position:sticky;padding-top:1.4rem}
+  .stack-card__desc{font-size:.92rem}
+}
+
+/* ============================================================
+   CARROUSEL — .crsl · rangée à flèches + défilement auto
+   ============================================================
+   Une piste scroll-snap que les flèches et l'autoplay déplacent
+   d'une carte à la fois ; en bout de piste, retour au départ.
+   Piloté par site.js ([data-crsl]) ; sans JS, la piste reste une
+   rangée défilable au doigt.
+   ============================================================ */
+.crsl{position:relative}
+.crsl__track{display:flex;gap:1.1rem;overflow-x:auto;
+  scroll-snap-type:x mandatory;scroll-behavior:smooth;
+  padding:.35rem .25rem 1.1rem;scrollbar-width:none}
+.crsl__track::-webkit-scrollbar{display:none}
+.crsl__track > *{scroll-snap-align:start;flex:none}
+.crsl__nav{display:flex;gap:.55rem}
+.crsl__btn{width:2.9rem;height:2.9rem;border-radius:50%;cursor:pointer;
+  border:1px solid var(--line);background:var(--bg);color:var(--fg);
+  display:inline-flex;align-items:center;justify-content:center;
+  transition:background .25s var(--ease-out),color .25s var(--ease-out),
+    border-color .25s var(--ease-out),transform .2s var(--ease-out)}
+.crsl__btn svg{width:1.05rem;height:1.05rem;fill:none;stroke:currentColor;
+  stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.crsl__btn:hover{background:var(--fg);border-color:var(--fg);color:#fff;
+  transform:translateY(-1px)}
+.crsl__btn:active{transform:translateY(0) scale(.96)}
+@media (prefers-reduced-motion:reduce){
+  .crsl__track{scroll-behavior:auto}
+}
+
+/* ================================================================
+   REFONTE « STEP-UP » 2026-08-07 — COMPOSANTS PARTAGÉS REHAUSSÉS
+   Pages cœur uniquement : les 16 pages géo n'utilisent aucune de
+   ces classes (.gr, .fq, .cmp, .stack) — vérifié le 2026-08-07.
+   ================================================================ */
+
+/* ============================================================
+   AVIS GOOGLE — la section parle la langue visuelle de Google :
+   fiche d'établissement à gauche du ruban, cartes d'avis au
+   gabarit Google (avatar, G quadrichrome, étoiles #FBBC04).
+   ============================================================ */
+.gr{background:#F8F9FA;border-top:0;position:relative}
+.gr::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(38rem 22rem at 12% 8%,rgba(66,133,244,.07),transparent 60%),
+    radial-gradient(34rem 20rem at 88% 90%,rgba(52,168,83,.06),transparent 60%),
+    radial-gradient(30rem 18rem at 70% 12%,rgba(251,188,5,.05),transparent 60%);}
+.gr > *{position:relative}
+/* Barre-badge fine (retour Bastien : la grande carte « faisait
+   bizarre ») : tout tient sur une ligne qui s'enroule au besoin. */
+.gr-head{display:flex;flex-direction:row;align-items:center;
+  justify-content:center;flex-wrap:wrap;gap:.7rem 1.15rem;
+  background:var(--bg);border:1px solid #DADCE0;border-radius:99px;
+  padding:.85rem clamp(1.1rem,2.5vw,1.9rem);
+  box-shadow:0 1px 2px rgba(60,64,67,.08),0 10px 28px -14px rgba(60,64,67,.22);
+  width:max-content;max-width:100%;margin-inline:auto}
+.gr-head::before{content:"";width:2.3rem;height:2.3rem;border-radius:50%;
+  background:var(--bg) center/1.9rem no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%234285F4' d='M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z'/%3E%3Cpath fill='%2334A853' d='M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24z'/%3E%3Cpath fill='%23FBBC05' d='M5.27 14.29c-.25-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.98-3.09z'/%3E%3Cpath fill='%23EA4335' d='M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.98 3.09C6.22 6.86 8.87 4.75 12 4.75z'/%3E%3C/svg%3E");
+  border:1px solid #DADCE0;box-shadow:0 1px 3px rgba(60,64,67,.12);
+  background-size:1.35rem;flex:none}
+.gr-head__word{font-size:1.25rem;letter-spacing:-.02em}
+.gr-stars{gap:.18rem;color:#FBBC04}
+.gr-stars svg{width:1.2rem;height:1.2rem;
+  filter:drop-shadow(0 2px 5px rgba(251,188,4,.4))}
+.gr-head__brand{border-color:#DADCE0;color:#3C4043;font-weight:500;margin-top:0;
+  box-shadow:inset 0 -1px 0 rgba(60,64,67,.04)}
+.gr-card{border-color:#DADCE0;border-radius:1.15rem;gap:.65rem;
+  padding:1.3rem 1.4rem;
+  box-shadow:0 1px 2px rgba(60,64,67,.06),0 1px 6px -1px rgba(60,64,67,.08)}
+@media (hover:hover) and (pointer:fine){
+  .gr-card:hover{transform:translateY(-5px);
+    box-shadow:0 1px 3px rgba(60,64,67,.1),0 10px 26px -8px rgba(60,64,67,.22)}
+}
+.gr-avatar{width:2.55rem;height:2.55rem;font-size:.95rem;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.35),0 1px 3px rgba(60,64,67,.18)}
+.gr-avatar--a{background:#7B5CC6}.gr-avatar--b{background:#EA4335}
+.gr-avatar--c{background:#4285F4}.gr-avatar--d{background:#0F9D58}
+.gr-card__name{font-size:.95rem}
+.gr-card__src{color:#5F6368}
+.gr-card__stars{color:#FBBC04;gap:.14rem;margin-top:.15rem}
+.gr-card__stars svg{width:.92rem;height:.92rem}
+.gr-card__text{color:#3C4043;font-size:.9rem}
+.gr__foot .btn-pill{background:#1A73E8;
+  box-shadow:0 1px 2px rgba(26,115,232,.35),0 6px 18px -6px rgba(26,115,232,.5)}
+.gr__foot .btn-pill::after{border-color:#1A73E8}
+.gr__foot .btn-pill:hover{color:#1A73E8}
+
+/* ============================================================
+   FAQ V2 — questions repliées dans des capsules plus franches :
+   numéro en médaille, croix en pastille pleine à l'ouverture,
+   filet d'accent qui s'allume, réponse sur fond crème.
+   ============================================================ */
+.fq-item{border-radius:1.15rem;position:relative;overflow:clip;
+  transition:border-color .3s var(--ease-out),box-shadow .3s var(--ease-out),
+    transform .3s var(--ease-out)}
+.fq-item::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:var(--fg);
+  opacity:0;transition:opacity .3s var(--ease-out)}
+.fq-item:hover{transform:translateX(4px);border-color:var(--fg-soft)}
+.fq-item:hover::before,.fq-item[open]::before{opacity:1}
+.fq-item[open]{box-shadow:var(--shadow-lg)}
+.fq-item__q{padding:1.25rem 1.35rem;font-size:1.02rem;gap:1rem}
+.fq-item__num{width:2.1rem;height:2.1rem;border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;
+  border:1px solid var(--line);background:var(--canvas);
+  font-size:.72rem;transition:background .3s var(--ease-out),
+    color .3s var(--ease-out),border-color .3s var(--ease-out)}
+.fq-item[open] .fq-item__num{background:var(--fg);color:#fff;border-color:var(--fg)}
+.fq-item__ico{width:2.1rem;height:2.1rem;border:1px solid var(--line);
+  background:var(--bg);transition:transform .45s var(--ease-back),
+    background .3s var(--ease-out),color .3s var(--ease-out),
+    border-color .3s var(--ease-out)}
+.fq-item[open] .fq-item__ico{transform:rotate(225deg);background:var(--fg);
+  color:#fff;border-color:var(--fg)}
+.fq-item__b{background:var(--canvas);border-top:1px dashed var(--line);
+  margin:0;padding:1.15rem 1.35rem 1.3rem 4.45rem}
+.fq-item__b p{max-width:58ch}
+.fq__card{border-radius:1.3rem;overflow:hidden;position:relative}
+.fq__card::after{content:"";position:absolute;right:-3rem;top:-3rem;
+  width:9rem;height:9rem;border-radius:50%;
+  background:radial-gradient(closest-side,rgba(20,20,24,.07),transparent)}
+
+/* ============================================================
+   COMPAREZ — la colonne Digistylze est un objet posé SUR le
+   tableau : soulevée, cerclée d'un dégradé, logo en tête. Les
+   coches éclosent quand la rangée se révèle (.is-in de site.js).
+   ============================================================ */
+.cmp-frame{border-radius:1.6rem;border:1px solid var(--line);
+  background:var(--bg);box-shadow:var(--shadow-lg);
+  padding:clamp(.4rem,1.4vw,1rem)}
+.cmp-table th.col--us{position:relative}
+.cmp-table thead th.col--us{background:linear-gradient(160deg,#26262E 0%,#0E0E12 78%);
+  box-shadow:0 -10px 26px -14px rgba(20,20,24,.55),
+    inset 0 1px 0 rgba(255,255,255,.14)}
+.cmp-table td.col--us{background:linear-gradient(180deg,#17171C 0%,#101014 100%);
+  box-shadow:inset 1px 0 0 rgba(255,255,255,.05),inset -1px 0 0 rgba(255,255,255,.05)}
+.cmp-table tbody tr:last-child td.col--us{
+  box-shadow:inset 1px 0 0 rgba(255,255,255,.05),inset -1px 0 0 rgba(255,255,255,.05),
+    inset 0 -1px 0 rgba(255,255,255,.05)}
+.cmp-logo{height:1.25rem;filter:drop-shadow(0 2px 8px rgba(255,255,255,.15))}
+.cmp-mark{width:1.75rem;height:1.75rem;border-radius:50%;
+  transition:transform .5s var(--ease-back)}
+.cmp-mark--yes{background:linear-gradient(160deg,#2FA66A,#1F8752);color:#fff;
+  box-shadow:0 3px 10px -2px rgba(47,166,106,.55)}
+.cmp-mark--no{background:rgba(184,62,59,.1)}
+.wf-rev-row .cmp-mark{transform:scale(0)}
+.wf-rev-row.is-in .cmp-mark{transform:scale(1)}
+html:not(.wf-js) .wf-rev-row .cmp-mark{transform:none}
+.cmp-table tbody tr{transition:background .25s var(--ease-out)}
+@media (hover:hover) and (pointer:fine){
+  .cmp-table tbody tr:hover{background:var(--canvas)}
+  .cmp-table tbody tr:hover td.col--us{
+    background:linear-gradient(180deg,#1D1D24 0%,#14141A 100%)}
+}
+.cmp-table th:first-child,.cmp-table td:first-child{font-weight:600}
+.cmp-val{margin-top:.45rem;line-height:1.35}
+.cmp-table td.col--us .cmp-val{font-weight:500}
+
+/* ============================================================
+   STACK CARDS — habillage rehaussé : liseré de teinte en tête,
+   médaille d'icône en dégradé, numéro-filigrane géant. Le
+   tassement continu (scale/blur scrubbé) vient de fx.js sur les
+   pages qui l'embarquent ; ailleurs le sticky + site.js suffit.
+   ============================================================ */
+.stack-card{overflow:clip;
+  box-shadow:0 -18px 44px -30px rgba(20,20,24,.5),var(--shadow-lg)}
+/* Liseré et halo NEUTRES : les étapes d'un process ne parlent
+   d'aucun service — les tons (coral/sky/violet/mint) qu'elles
+   portaient sont réservés aux contenus qui parlent du service
+   propriétaire de la couleur. Règle client du 2026-08-07. */
+.stack-card::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;
+  background:var(--fg);opacity:.9}
+.stack-card{position:sticky;isolation:isolate}
+.stack-card::after{content:"";position:absolute;right:-6rem;bottom:-7rem;
+  width:20rem;height:20rem;border-radius:50%;z-index:-1;
+  background:radial-gradient(closest-side,rgba(20,20,24,.06),transparent)}
+.stack-card__ico{background:var(--fg);color:#fff;
+  box-shadow:0 6px 16px -6px rgba(20,20,24,.45)}
+.stack-card__ico .picto{color:#fff}
+.stack-card__num{-webkit-text-stroke:1.5px var(--line);color:transparent;
+  font-size:clamp(5.4rem,12vw,9rem);line-height:.85;
+  transition:color .5s var(--ease-out)}
+.stack-card.is-front .stack-card__num{background:none;-webkit-text-stroke:1.5px var(--fg);
+  -webkit-background-clip:initial;background-clip:initial}
+.stack-card__when{border:1px solid var(--line);border-radius:99px;
+  padding:.3rem .8rem;background:var(--canvas);font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase}
+/* Le picto de la carte FAQ trace en blanc sur sa médaille sombre. */
+.fq__card-ico{color:#fff}
+.fq__card-ico .picto{color:#fff}
+
+/* ============================================================
+   PICTOS CENTRÉS — correctif 2026-08-07 (retour Bastien)
+   Le picto-slot garde une margin-right de .55rem héritée de son
+   usage EN LIGNE (avant un libellé). Dans une médaille carrée,
+   cette marge décale le glyphe : ici, chaque médaille centre en
+   grid et remet la marge du slot à zéro.
+   ============================================================ */
+.stack-card__ico,.fq__card-ico,.fq-item__ico,.kpi-item__ico,
+.why-card__ico,.next-card__ico,.sit-card__ico,.diff-card__ico,
+.inc-item__ico,.gr-avatar{display:grid;place-items:center}
+/* [data-picto] répété exprès : sections.css (chargée après ce
+   fichier) pose `.picto-slot[data-picto]{margin-right:.55rem}` à
+   spécificité (0,2,0) — il faut (0,3,0) pour la battre. */
+.stack-card__ico .picto-slot[data-picto],.fq__card-ico .picto-slot[data-picto],
+.kpi-item__ico .picto-slot[data-picto],.why-card__ico .picto-slot[data-picto],
+.next-card__ico .picto-slot[data-picto],.sit-card__ico .picto-slot[data-picto],
+.diff-card__ico .picto-slot[data-picto],.inc-item__ico .picto-slot[data-picto]{
+  margin:0;vertical-align:0;display:inline-flex}
+
+/* Barre-badge Google : repli propre sous 640px. */
+@media (max-width:640px){
+  .gr-head{border-radius:1.2rem;padding:.9rem 1.1rem;gap:.55rem .9rem}
+  .gr-head__note{width:100%;text-align:center}
+}
+/* Retour Bastien 2026-08-07 : le mot « Excellent » sort du badge —
+   le G, les étoiles et la note suffisent. */
+.gr-head__word{display:none}
+
+/* Retour Bastien 2026-08-10 : dans le tableau comparatif, le verdict
+   passe À GAUCHE du texte, sur la même ligne — la pastille ouvrait la
+   cellule par le haut, elle l'ouvre maintenant par la gauche.
+
+   Écrit dans un `min-width` et non en modifiant les règles de base :
+   sous 640px le tableau bascule en cartes (`td{display:flex}`, label en
+   ::before), disposition qui a ses propres réglages de pastille. Une
+   règle sans media query, placée en fin de fichier, écraserait ceux du
+   bloc mobile — c'est déjà ce qui arrive à `.cmp-mark` §step-up.
+
+   Pas de `display:flex` sur la cellule : elle cesserait alors d'être une
+   cellule de tableau et sa bordure basse se dessinerait à la hauteur de
+   son propre contenu, pas à celle de sa ligne (voir le commentaire de
+   `.cmp-table td:first-child`). Deux inline-block alignés au milieu
+   font le même travail sans toucher au modèle de tableau. */
+@media (min-width:641px){
+  .cmp-table td.col--us,.cmp-table td.cmp-other{text-align:left}
+  .cmp-mark{margin:0 .6rem 0 0;vertical-align:middle}
+  /* 2,4rem = la pastille (1,75) plus sa marge (0,6). Les deux span sont
+     collés dans le HTML : aucun blanc inline à déduire en plus. */
+  .cmp-val{display:inline-block;vertical-align:middle;margin-top:0;
+    width:calc(100% - 2.4rem);text-align:left}
+  /* Retour Bastien 2026-08-10 (2) : les libellés de colonnes passent à
+     gauche eux aussi, calés sur le TEXTE des cellules — pas sur leur
+     pastille. Le retrait ajoute donc au padding de la cellule ce qui
+     précède le texte : pastille + marge (2,4rem) dans les colonnes de
+     verdict, picto + marge (1,55rem) dans la colonne des critères. Le
+     logo Digistylze suit le même alignement (son margin:0 auto le
+     centrait). */
+  .cmp-table thead th{text-align:left}
+  .cmp-table thead th:first-child{padding-left:calc(1.2rem + 1.8rem)}
+  .cmp-table thead th.col--us,
+  .cmp-table thead th:nth-child(3),
+  .cmp-table thead th:nth-child(4){padding-left:calc(1.2rem + 2.4rem)}
+  .cmp-logo{margin-left:0}
+}
+
+/* ============================================================
+   LA COUCHE WEBGL — le fondu croisé avec son repli
+   ============================================================
+   Ajouté le 2026-08-12. `assets/js/gl.js` pose `.a-gl` sur le
+   `.fx-stage` du héros, mais SEULEMENT une fois la première image
+   réellement tirée. Jusque-là, et pour toujours si la porte refuse,
+   ce sont les `.fx-orb` qui sont à l'écran — c'est-à-dire le rendu
+   de production d'aujourd'hui.
+
+   Ce que le canvas remplace, et pourquoi il se rembourse : chaque
+   `.fx-orb` est une boîte de plusieurs centaines de pixels en
+   `filter:blur(60px)` avec un tween infini. L'accueil en porte onze.
+   Onze grandes couches floues recomposées indéfiniment par le
+   compositeur, contre un tirage plein écran à 0,6× de résolution.
+
+   L'opacité est libre : la chorégraphie des orbes (fx.js §9) n'anime
+   que x, y et scale. Rien ne se dispute cette propriété.
+   ============================================================ */
+.fx-stage .fx-orb{transition:opacity .8s var(--ease-out)}
+.fx-stage.a-gl .fx-orb{opacity:0}
+/* Le canvas prend la place du grain sur son hôte : le grain est cuit
+   dans le shader, deux couches de bruit superposées feraient sale. */
+.fx-stage.a-gl + .fx-grain::after,
+.fx-grain:has(.fx-stage.a-gl)::after{opacity:0}
+@media (prefers-reduced-motion:reduce){
+  .fx-stage .fx-orb{transition:none}
+}
+
+/* ============================================================
+   LES HÉROS — LE PREMIER ÉCRAN EN OCCUPE UN
+   ============================================================
+   2026-08-12. Mesuré avant travaux : une seule page sur quinze
+   déclarait une hauteur d'écran pour son héros (index.html, en
+   inline). Les quatorze autres étaient des blocs dimensionnés par
+   leur contenu — 659px sur creation-site-web pour une fenêtre de
+   900. Un premier écran qui n'occupe pas son écran ne peut pas
+   porter une première impression.
+
+   Une seule règle les sert toutes : les quinze sections portent
+   `data-fx-hero`, et aucune des quatorze ne déclarait de `display`
+   ni de `min-height` — il n'y a donc rien à écraser.
+
+   `min-height` et jamais `height` : un héros dont la copy déborde
+   doit grandir, pas rogner.
+
+   `svh` et non `vh` : sur iOS, `vh` ignore la barre d'URL et fait
+   dépasser la section d'environ 90px au chargement. La ligne `vh`
+   au-dessus reste le repli des moteurs sans `svh`.
+
+   `- var(--head)` n'est pas cosmétique : `.header` occupe 4,2rem de
+   flux. Un `100svh` sec donne une page de 100svh + 4,2rem et fait
+   tomber le bas du héros sous la ligne de flottaison sur TOUS les
+   écrans.
+
+   Libérée sous 720px : une page de service fait déjà 23,5 écrans à
+   375px, et un plein écran impose à un héros dont la scène s'empile
+   sous la copy de repousser le premier CTA à près de deux écrans de
+   profondeur. La hauteur d'écran est une règle de grand format.
+   ============================================================ */
+[data-fx-hero]{--head:4.2rem;position:relative;
+  min-height:calc(100vh - var(--head));
+  min-height:calc(100svh - var(--head));
+  display:grid;align-content:center}
+@media (max-width:720px){
+  [data-fx-hero]{min-height:auto;display:block}
+}
+
+/* ============================================================
+   COUCHE PREMIUM PARTAGÉE — 2026-08-12
+   ============================================================
+   Quatre effets posés sur les composants DÉJÀ mutualisés du site,
+   pour que les quinze pages montent d'un cran en même temps plutôt
+   qu'une par une.
+
+   Ce qui existait déjà et n'est donc pas refait : le réveil masqué
+   mot à mot des titres (data-fx-title), le reveal avec flou sur 667
+   éléments (data-fx), les compteurs, le bouton magnétique, le
+   marquee sensible à la vélocité, le tilt 3D, la pile de cartes, le
+   tracé SVG. Le site avait déjà l'essentiel du vocabulaire ; il lui
+   manquait la matière.
+   ============================================================ */
+
+/* 1 — LE PROJECTEUR SUR TOUTES LES CARTES
+   Une lueur douce suit le curseur à l'intérieur de la carte. Deux
+   familles l'avaient déjà (.why-card, .kpc) ; elle devient la règle.
+   --mx/--my sont posés par la scène `projecteur` de fx.js, en
+   pourcentages, via un seul écouteur délégué — jamais un par carte.
+   Gaté au pointeur fin : jamais au doigt. */
+@media (hover:hover) and (pointer:fine){
+  .sc-card,.gr-card,.pr-card,.res-card,.why-card,.kpc,.sit-card,
+  .next-card,.diff-card,.incx-tile,.stack-card,.fq__card{
+    position:relative;isolation:isolate}
+  .sc-card::before,.gr-card::before,.pr-card::before,.res-card::before,
+  .sit-card::before,.next-card::before,.diff-card::before,
+  .incx-tile::before,.stack-card::before,.fq__card::before{
+    content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;
+    opacity:0;transition:opacity .45s var(--ease-out);
+    background:radial-gradient(14rem 14rem at var(--mx,50%) var(--my,50%),
+      rgba(20,20,24,.055),transparent 70%)}
+  .sc-card:hover::before,.gr-card:hover::before,.pr-card:hover::before,
+  .res-card:hover::before,.sit-card:hover::before,.next-card:hover::before,
+  .diff-card:hover::before,.incx-tile:hover::before,
+  .stack-card:hover::before,.fq__card:hover::before{opacity:1}
+  /* Sur fond d'encre, la lueur est claire — sinon elle disparaît. */
+  .sc--night .sc-card::before,.why .why-card::before,.nightp .sc-card::before,
+  .sc-panel .sc-card::before{
+    background:radial-gradient(14rem 14rem at var(--mx,50%) var(--my,50%),
+      rgba(255,255,255,.07),transparent 70%)}
+}
+
+/* 2 — LE BALAYAGE DES TITRES : ÉCARTÉ, ET POURQUOI
+   Un reflet traversant le titre demande `color:transparent` +
+   `background-clip:text`. Si le fond ne peint pas — moteur ancien,
+   règle partiellement appliquée, extension qui neutralise les
+   dégradés — le titre devient INVISIBLE. C'est la panne la plus
+   grave possible sur un site vitrine, et c'est exactement ce que
+   l'invariant n°1 du projet interdit : rien n'est jamais masqué par
+   une couche décorative.
+   L'effet n'apportait rien que les titres n'aient déjà : les 133
+   `data-fx-title` du site font un réveil masqué mot à mot, qui est
+   de la même famille et ne cache rien. Écarté le 2026-08-12. */
+
+/* 3 — LE HALO DE LA CLÔTURE
+   La section CTA existe sur onze pages avec le même markup : un seul
+   habillage les rehausse toutes. Anneau lumineux qui tourne lentement
+   derrière le bloc, sans jamais toucher au texte.
+   Le dégradé est peint dans une boîte DÉLIBÉRÉMENT plus grande que la
+   section (140% x 140%) : un dégradé n'est peint que dans la boîte de
+   son élément, ce qui dépasse est tranché net, pas estompé — c'est le
+   piège documenté quatre fois dans premium.css. */
+.cta{position:relative;isolation:isolate;overflow:clip}
+.cta::before{content:"";position:absolute;z-index:-1;pointer-events:none;
+  left:-20%;top:-20%;width:140%;height:140%;
+  background:conic-gradient(from 0deg,
+    transparent 0deg,rgba(255,255,255,.10) 40deg,transparent 110deg,
+    transparent 250deg,rgba(255,255,255,.07) 300deg,transparent 360deg);
+  animation:haloCloture 26s linear infinite}
+@keyframes haloCloture{to{rotate:360deg}}
+@media (prefers-reduced-motion:reduce){
+  .cta::before{animation:none;opacity:.5}
+}
+
+/* 4 — LE FONDU DE SEUIL
+   Le passage d'une section claire à une bande d'encre était une ligne
+   droite et franche. Un dégradé de 5rem, posé en ::after sur la
+   section CLAIRE qui précède, dissout la frontière.
+   Posé par la scène `seuil` de fx.js, qui ne le met que là où deux
+   valeurs différentes se touchent réellement. */
+/* 2026-08-13, retour client : les frontières entre sections sont
+   NETTES — le voile de seuil ne se peint plus. La scène fx `seuil`
+   continue de poser la classe, elle ne produit simplement plus
+   rien : réversible en rendant son ::after au besoin. */
+.a-seuil{position:relative}
+.a-seuil::after{content:none;position:absolute;left:0;right:0;bottom:0;
+  height:5rem;pointer-events:none;z-index:1;
+  background:linear-gradient(180deg,transparent,var(--seuil-vers,var(--night)))}
+
+/* ============================================================
+   ORBES DE JOUR — les nappes de lumière des héros clairs
+   ============================================================
+   2026-08-12. `premium.css` en avait trois (--a/--b/--c) mais il ne
+   sert que deux pages ; `premium-pages.css`, qui sert les treize
+   autres, n'avait que les orbes de NUIT, blanches, invisibles sur un
+   fond clair. Trois héros n'avaient donc aucune scène du tout :
+   contact, agence-linkedin-ads, agence-tiktok-ads — les trois
+   entrées les plus faibles du site.
+
+   Nommées `--jour-*` et non `--a/--b/--c` pour ne pas entrer en
+   collision avec celles de premium.css sur les deux pages premium.
+
+   Ce sont AUSSI le repli de la couche WebGL : `gl.js` monte son
+   canvas dans le `.fx-stage` du héros et n'efface ces orbes qu'une
+   fois sa première image tirée. Sans WebGL, elles restent seules —
+   et elles suffisent.
+   ============================================================ */
+.fx-orb--jour-a{width:30rem;height:30rem;left:-8rem;top:-9rem;opacity:.34;
+  background:radial-gradient(circle,rgba(251,183,142,.9),transparent 68%)}
+.fx-orb--jour-b{width:26rem;height:26rem;right:-7rem;top:14%;opacity:.30;
+  background:radial-gradient(circle,rgba(163,202,235,.9),transparent 68%)}
+.fx-orb--jour-c{width:22rem;height:22rem;left:38%;bottom:-8rem;opacity:.24;
+  background:radial-gradient(circle,rgba(190,154,199,.9),transparent 68%)}
+/* Sous 860px premium.css éteint déjà ses orbes : on suit la même
+   règle, un flou de 60px sur trois grandes boîtes est le poste le plus
+   cher du compositeur sur un téléphone. */
+@media (max-width:860px){
+  .fx-orb--jour-a,.fx-orb--jour-b,.fx-orb--jour-c{display:none}
+}
+/* Les CTA du héros de contact : même gabarit que les autres héros du
+   site, simplement remis là où ils manquaient. */
+.ct-hero__ctas{display:flex;flex-wrap:wrap;gap:.7rem;margin-top:1.6rem}
+.ct-hero__ctas + .microcopy{margin-top:.9rem}
+
+/* ================================================================
+   LES SIGNATURES REPRISES DES RÉFÉRENCES — 2026-08-12
+   ================================================================
+   Trois motifs relevés sur les sites donnés en référence, réécrits
+   ici dans le système du site. Aucun code copié : ce sont des
+   techniques, réimplémentées avec les jetons et les classes maison.
+
+   Ils se posent tous sur des composants DÉJÀ mutualisés, donc les
+   quinze pages les reçoivent ensemble.
+   ================================================================ */
+
+/* 1 — LE SURTITRE, NU
+   Les surtitres ont porte des crochets `[ NOS EXPERTISES ]`, releves
+   sur Lama Lama (Awwwards). Retires a la demande du client : le motif
+   est devenu un tic, on le lit maintenant comme une signature de page
+   generee plutot que comme un marqueur de systeme. Le surtitre se
+   suffit de sa graisse, de son interlettrage et de son picto.
+
+   Retire ICI, a la source, et pas neutralise page par page : le
+   mecanisme vivait dans site.css, donc sur les 34 pages. */
+
+/* 2 — LA TRAME SUR L'ENCRE
+   Relevé sur Lama Lama : le fond quasi noir n'est jamais un aplat, il
+   porte une trame de points très discrète. C'est ce qui fait lire une
+   surface sombre comme imprimée plutôt que comme du vide — et c'est
+   aussi ce qui tue le banding des dégradés sombres.
+
+   Même intention que le « Dot Grid » du catalogue React Bits, en CSS
+   pur : un radial-gradient répété coûte un tile, pas un shader.
+
+   Posé en ::after sur les sections d'encre, sous le contenu. Les
+   sections qui portent déjà `.fx-grain` ont leur propre texture — on ne
+   superpose pas deux bruits, ça fait sale. */
+.sc--night:not(.fx-grain)::after,
+.why:not(.fx-grain)::after,
+section.cta:not(.fx-grain)::after,
+.sc-panel::after{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+  background-image:radial-gradient(rgba(255,255,255,.13) 1px,transparent 1px);
+  background-size:22px 22px;opacity:.5;
+  -webkit-mask-image:radial-gradient(120% 90% at 50% 0%,#000 30%,transparent 78%);
+  mask-image:radial-gradient(120% 90% at 50% 0%,#000 30%,transparent 78%)}
+.sc--night,.why,section.cta,.sc-panel{position:relative}
+.sc--night > *,.why > *,section.cta > *,.sc-panel > *{position:relative;z-index:1}
+
+/* 3 — L'ANNEAU DU BOUTON PRINCIPAL
+   Relevé sur React Bits (« Star Border » / « Electric Border ») : un
+   filet lumineux qui fait le tour du bouton d'appel. Sur un site où
+   tout est noir et blanc, c'est le seul endroit où un mouvement continu
+   se justifie — c'est LA cible de la page.
+
+   Un `conic-gradient` tournant dans un ::before rogné par le rayon du
+   bouton. Réservé au CTA principal (`#cta-primary` et les boutons de
+   clôture), jamais à tous les `.btn-pill` : un site où tout scintille
+   ne dit plus où cliquer.
+
+   Gaté au pointeur fin ET au mouvement non réduit. Le bouton reste
+   entièrement fonctionnel et lisible sans lui. */
+@media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+  /* La cible est designee par son ROLE, pas par sa classe d'habillage :
+     `data-conversion` est l'attribut que le site pose deja sur chaque
+     point de conversion, et `.form__btn` est le bouton d'envoi des
+     formulaires de cloture. Les deux ensemble couvrent les quinze pages,
+     la ou `.btn-pill` en ratait cinq. */
+  [data-conversion^="lead-cta"],.form__btn,.cta .btn-pill{
+    position:relative;isolation:isolate}
+  [data-conversion^="lead-cta"]::after,.form__btn::after,.cta .btn-pill::after{
+    content:"";position:absolute;inset:-2px;z-index:-1;border-radius:inherit;
+    background:conic-gradient(from 0deg,transparent 0deg,
+      rgba(255,255,255,.55) 28deg,transparent 70deg,transparent 360deg);
+    opacity:0;transition:opacity .4s var(--ease-out);
+    animation:anneauCta 3.4s linear infinite}
+  [data-conversion^="lead-cta"]:hover::after,.form__btn:hover::after,
+  .cta .btn-pill:hover::after,
+  [data-conversion^="lead-cta"]:focus-visible::after,.form__btn:focus-visible::after,
+  .cta .btn-pill:focus-visible::after{opacity:1}
+  @keyframes anneauCta{to{rotate:360deg}}
+}
+
+/* ============================================================
+   HEADER v2 — LA CAPSULE (2026-08-13, réglages client le jour même)
+
+   LA CAPSULE EST L'ÉTAT DE BASE : plus d'états au scroll — le
+   bandeau est TOUJOURS la pilule de verre flottante, dès le
+   chargement, JS ou pas (c'est du CSS pur). La hauteur de flux
+   reste 4,2rem : marge .7rem + pilule 3.1rem + marge .4rem — les
+   scènes collantes (roue, travelling) comptent dessus.
+
+   LE ROULEAU DU LOGO est en SURIMPRESSION (position:absolute) :
+   son ouverture ne pousse plus la nav — retour client : « pas de
+   décalage au niveau des noms des pages ». Il n'existe qu'au
+   pointeur fin ET au-dessus de 1121px, là où le couloir entre
+   l'icône et la nav fait plus de 250px : il ne recouvre jamais
+   un lien. Sans fx : icône + wordmark statiques, dans le flux.
+   ============================================================ */
+/* SURIMPRESSION, PAS DE COLLAGE (retour client 2026-08-13) :
+   le header ne prend plus de place dans le flux (plus de bande
+   blanche au-dessus d'un héros sombre) et ne suit plus le
+   défilement — il appartient au haut de la page et s'en va avec.
+   Les héros plein écran regagnent leurs 4,2rem (premium.css §62). */
+/* Redevenu COLLANT le 2026-08-13 (retour client, 4e passe header) :
+   fixed et non sticky — même géométrie de surimpression qu'en
+   absolute (aucune bande, aucun décalage), mais il suit la page. */
+.header--v2{position:fixed;top:0;left:0;right:0;
+  background:transparent;border-bottom:0;
+  backdrop-filter:none;-webkit-backdrop-filter:none}
+.header--v2 .header__inner{
+  margin-block:.7rem .4rem;height:3.1rem;
+  padding-inline:1rem;
+  background:rgba(255,255,255,.78);
+  backdrop-filter:blur(16px) saturate(150%);
+  -webkit-backdrop-filter:blur(16px) saturate(150%);
+  border:1px solid var(--line);border-radius:var(--radius-pill);
+  box-shadow:0 12px 32px -18px rgba(20,20,24,.28),0 2px 8px rgba(20,20,24,.05);
+}
+/* Le bouton se CALE dans la capsule (retour Bastien 2026-08-13 :
+   « décalé à gauche », étendu au mobile le 2026-08-14 — même
+   défaut, même remède) : pilule dans pilule, même respiration à
+   droite qu'en haut/bas (4px), pendant que le logo garde son 1rem.
+   Le rembourrage de la capsule reste — seul le CTA mord dessus. */
+.header--v2 .actions .cta{margin-right:-.8rem}
+
+/* — le logo : icône + rouleau — */
+.logo--roll{gap:.7rem;min-width:0;position:relative}
+.logo__mark{height:1.7rem;width:auto;flex:none;
+  transition:transform .5s var(--ease-back)}
+.logo--roll:hover .logo__mark{transform:rotate(-8deg) scale(1.06)}
+/* Sans fx : le wordmark seul (logo-texte.svg, recadré sur sa boîte
+   d'encre) vit DANS le flux, à côté de l'icône. */
+.logo__mask{display:block;height:1.35rem;overflow:clip;min-width:0}
+.logo__roue{display:block}
+.logo__roue i{display:none}
+.logo__roue img{display:block;height:1.02rem;width:auto;margin-top:.165rem}
+
+/* Avec fx : le masque passe en surimpression à droite de l'icône —
+   il ne prend AUCUNE place dans le flux, la nav ne bouge pas. */
+html.wf-js.has-fx .logo__roue i{
+  display:flex;align-items:center;height:1.35rem;
+  font-style:normal;font-size:.98rem;font-weight:600;
+  letter-spacing:-.01em;color:var(--fg);white-space:nowrap;
+}
+html.wf-js.has-fx .logo__roue img{height:1.02rem;margin-block:.165rem}
+html.wf-js.has-fx .logo__mask{
+  position:absolute;left:calc(1.7rem + .7rem);top:50%;
+  translate:0 -50%;width:11rem;
+  opacity:0;transform:translateX(-.4rem);
+  transition:opacity .3s var(--ease-out),transform .45s var(--ease-out);
+  pointer-events:none;
+}
+html.wf-js.has-fx .logo--roll.is-roll .logo__mask{opacity:1;transform:none}
+/* Au doigt ou dès que le couloir se resserre : l'icône seule. */
+@media (hover:none){
+  html.wf-js.has-fx .logo__mask{display:none}
+}
+@media (max-width:1120px){
+  html.wf-js.has-fx .logo__mask{display:none}
+}
+
+/* — les liens de nav : le roulé double-étiquette — */
+.header--v2 .mm__btn > span:has(.mmr){display:inline-block;
+  height:1.5em;overflow:clip}
+.header--v2 .mmr{display:flex;flex-direction:column;
+  transition:transform .4s var(--ease-out)}
+.header--v2 .mmr span{display:block;line-height:1.5;height:1.5em}
+@media (hover:hover) and (pointer:fine){
+  .header--v2 .mm__btn:hover .mmr{transform:translateY(-50%)}
+}
+
+/* ============================================================
+   HEADER v2 — LE PANNEAU DU MÉGA-MENU, RECOMPOSÉ
+
+   Retour client : « ça fait cheap ». Le panneau devient une
+   carte : rayon large, ombre posée, colonnes aérées, et chaque
+   lien devient un RANG À PASTILLE — le survol pose un fond, le
+   médaillon d'icône se soulève. Un PIED DE PANNEAU (site.js,
+   seulement sur les pages en header v2) ferme la carte avec
+   l'appel découverte. Les pages géo gardent l'ancien panneau :
+   tout est borné à `.header--v2`.
+   ============================================================ */
+.header--v2 .mm__panel{
+  border-radius:var(--radius-lg);
+  box-shadow:0 30px 70px -30px rgba(20,20,24,.35),0 4px 14px rgba(20,20,24,.06);
+  top:calc(100% + .9rem);
+}
+.header--v2 .mm__inner,
+.header--v2 .mm__measure{padding:1.35rem;gap:2rem}
+.header--v2 .mm__col h3{
+  margin-bottom:.7rem;padding-inline:.6rem;
+  font-size:.66rem;letter-spacing:.14em;
+}
+.header--v2 .mm__col ul{gap:.15rem}
+.header--v2 .mm__link{
+  align-items:center;gap:.8rem;
+  padding:.55rem .6rem;border-radius:12px;
+  transition:background .25s var(--ease-out);
+}
+.header--v2 .mm__link:hover{background:var(--canvas-2)}
+.header--v2 .mm__ico{
+  width:2.4rem;height:2.4rem;border-radius:.7rem;
+  transition:transform .3s var(--ease-back);
+}
+.header--v2 .mm__link:hover .mm__ico{transform:translateY(-2px) scale(1.05)}
+.header--v2 .mm__txt b{font-size:.9rem}
+.header--v2 .mm__txt span{font-size:.76rem}
+
+/* ============================================================
+   LE PANNEAU EN DEUX ZONES (retour client : « une autre manière,
+   plus design ») — à gauche les colonnes de liens ; à droite LA
+   VITRINE : un panneau d'encre (la recette sc-panel) qui porte
+   l'entrée en matière, l'appel découverte et la preuve Google.
+   Le rang-pied disparaît : son contenu vit dans la vitrine.
+   ============================================================ */
+.header--v2 .mm__vitrine{
+  align-self:stretch;
+  display:flex;flex-direction:column;align-items:flex-start;
+  gap:.55rem;min-width:15rem;max-width:17rem;
+  padding:1.3rem 1.3rem 1.2rem;
+  border-radius:14px;
+  color:var(--night-fg);
+  position:relative;isolation:isolate;overflow:clip;
+  background:
+    radial-gradient(16rem 10rem at 14% 8%,rgba(255,255,255,.10),transparent 62%),
+    radial-gradient(18rem 12rem at 92% 96%,rgba(234,87,83,.16),transparent 64%),
+    linear-gradient(170deg,#17171D 0%,var(--night) 55%,#101016 100%);
+}
+.header--v2 .mm__vitrine-sur{
+  font-size:.64rem;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:rgba(255,255,255,.55);
+}
+.header--v2 .mm__vitrine b{
+  font-size:1.06rem;font-weight:600;letter-spacing:-.01em;line-height:1.25;
+}
+.header--v2 .mm__vitrine p{
+  margin:0;font-size:.8rem;line-height:1.5;color:var(--night-muted);
+}
+.header--v2 .mm__vitrine-cta{
+  display:inline-flex;align-items:center;gap:.5rem;
+  margin-top:.35rem;
+  padding:.55rem 1.05rem;border-radius:var(--radius-pill);
+  background:#fff;color:var(--fg);
+  font-size:.82rem;font-weight:600;white-space:nowrap;
+  transition:transform .3s var(--ease-out);
+}
+.header--v2 .mm__vitrine-cta svg{width:.9rem;height:.9rem;fill:none;
+  stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
+  transition:transform .3s var(--ease-out)}
+.header--v2 .mm__vitrine-cta:hover{transform:translateY(-1px)}
+.header--v2 .mm__vitrine-cta:hover svg{transform:translateX(3px)}
+.header--v2 .mm__vitrine-preuve{
+  margin-top:auto;padding-top:.7rem;
+  display:inline-flex;align-items:center;gap:.4rem;
+  font-size:.74rem;color:var(--night-muted);
+}
+.header--v2 .mm__vitrine-preuve svg{width:.8rem;height:.8rem;fill:#F7A823}

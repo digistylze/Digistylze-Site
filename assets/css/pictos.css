@@ -1,0 +1,147 @@
+/* ================================================================
+   DIGISTYLZE — DOMAINES DE COULEUR ET PICTOGRAMMES
+
+   Ce fichier remplace `compose.css` (483 l. / 26 Ko) et
+   `sections.css` (1 499 l. / 82 Ko), retirés des pages le
+   2026-08-12.
+
+   POURQUOI
+   Les deux feuilles étaient chargées sur les 34 pages du site et
+   n'étaient appliquées par aucune. Mesuré sélecteur par sélecteur,
+   en tenant compte des classes posées à l'exécution :
+
+     compose.css   191 sélecteurs — les 14 archétypes `.ar-*` : 0 usage.
+                   Seul `.workshot` servait, et seulement dans
+                   ressources.html, page orpheline en noindex qui
+                   n'est pas déployée (.vercelignore). Cette page
+                   garde donc ses deux <link> d'origine, inchangés.
+
+     sections.css  579 sélecteurs — les 8 sections `.dz-*` : 0 usage.
+                   La couche d'effets par attributs (`data-carte`,
+                   `data-reveal`, `data-theme`, `data-fond-effet`,
+                   `data-parallaxe`, `data-progression`, `data-marquee`,
+                   `data-mesure`, `data-densite`) : 0 usage pour chacun.
+                   Les jetons `--motion-*` et `--masque-*` n'étaient lus
+                   que par ces blocs morts.
+
+   Restent les trois choses qui servent vraiment, réunies ici.
+
+   ATTENTION — `.picto` est posée à l'EXÉCUTION par picto.js:82, elle
+   n'apparaît dans aucun HTML. Un audit statique la déclare morte à
+   tort. Ne pas la retirer.
+
+   Chargée après site.css, comme les feuilles qu'elle remplace.
+   ================================================================ */
+
+
+/* ============================================================
+   1 — DOMAINES DE COULEUR
+
+   Le site a six dégradés et six tons de texte accessibles, et une
+   loi : jamais deux dégradés mélangés sur une page, jamais de
+   couleur 500 en petit corps sur blanc.
+
+   La classe se pose sur la SECTION, pas sur <body> : le shell des
+   34 pages n'a pas à bouger, et le garde-fou reste vérifiable —
+     grep -o 'dom-[a-z]*' page.html | sort -u
+   doit rendre une seule valeur.
+
+   `--dz-accent` est le ton TEXTE (contraste AA garanti sur blanc),
+   `--dz-accent-grad` le dégradé, réservé aux surfaces et aux auras.
+
+   Deux consommateurs, et deux seulement : `.picto` ci-dessous, et
+   viz.css:41-42 qui en dérive `--viz-accent` / `--viz-grad`.
+   ============================================================ */
+.dom-coral   {--dz-accent:var(--coral-text);    --dz-accent-grad:var(--grad-coral)}
+.dom-violet  {--dz-accent:var(--violet-text);   --dz-accent-grad:var(--grad-violet)}
+.dom-mint    {--dz-accent:var(--mint-text);     --dz-accent-grad:var(--grad-mint)}
+.dom-sky     {--dz-accent:var(--sky-text);      --dz-accent-grad:var(--grad-sky)}
+.dom-sunshine{--dz-accent:var(--sunshine-text); --dz-accent-grad:var(--grad-sunshine)}
+.dom-sunset  {--dz-accent:var(--sunset-text);   --dz-accent-grad:var(--grad-sunset)}
+
+/* Le repli neutre passait par `[class*="dz-"]`, retiré ici pour deux
+   raisons : plus aucune classe `dz-` n'existe, et un sélecteur de
+   sous-chaîne sur `class` s'applique à l'attribut ENTIER — c'est
+   exactement le piège qui avait transformé des pastilles d'avatar de
+   40px en ovales de 205px (compose.css, 2026-08). Le repli est
+   désormais porté par le `var(--dz-accent, var(--fg))` de `.picto`,
+   qui fait le même travail sans sélecteur. */
+
+
+/* ============================================================
+   2 — FILET DE SÉCURITÉ DE LA COUCHE MOTION
+
+   Repris de compose.css:438-444. Les 19 pages legacy (16 géo +
+   mentions + politique + ressources) portent `[data-motion="draw"]`
+   sur leurs pictogrammes, posé par picto.js:91.
+
+   Aucune règle ne masque `draw` — seuls `reveal` et `stagger`
+   l'étaient, et ni l'un ni l'autre n'existe dans le HTML. La ligne
+   est donc conservée comme invariant, pas comme correctif : un
+   élément à `[data-motion]` est visible, point.
+   ============================================================ */
+[data-motion]{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  [data-motion]{opacity:1!important;transform:none!important}
+}
+
+
+/* ============================================================
+   3 — PICTOGRAMMES TRACÉS
+
+   Le SVG est injecté par assets/js/picto.js depuis l'attribut
+   data-picto. Ces règles ne décrivent que le cadre : le tracé
+   lui-même est piloté par GSAP DrawSVG.
+
+   Trait seul, currentColor, jamais de fond ni de pastille de
+   couleur — la convention d'icône du styleguide.
+   ============================================================ */
+.picto{display:inline-flex;align-items:center;justify-content:center;
+  width:var(--picto-taille,2.5rem);height:var(--picto-taille,2.5rem);
+  color:var(--dz-accent,var(--fg));flex:none}
+.picto svg{width:100%;height:100%;overflow:visible}
+/* Sans JS, l'attribut reste vide : on ne réserve pas d'espace pour un
+   picto qui n'arrivera pas. */
+[data-picto]:empty{display:none}
+.picto--fin{--picto-taille:1.5rem}
+.picto--large{--picto-taille:3.25rem}
+
+/* Pose des pictos sur index.html — un signe par domaine d'expertise.
+   Les six blocs portaient déjà six listes de coches identiques : c'est le
+   BLOC qui doit être identifiable, pas chaque puce. Le picto prend la
+   couleur du domaine, posée par data-tone sur l'article.
+   Le picto de domaine vit EN LIGNE devant le surtitre, comme partout
+   ailleurs : une marge basse y laisserait un blanc parasite. Seule la
+   couleur reste propre au bloc. */
+.exp-block .picto{--picto-taille:1.15rem;color:var(--tone,var(--fg))}
+.exp-block[data-tone="coral"]    .picto{color:var(--coral-text)}
+.exp-block[data-tone="sunshine"] .picto{color:var(--sunshine-text)}
+.exp-block[data-tone="mint"]     .picto{color:var(--mint-text)}
+.exp-block[data-tone="violet"]   .picto{color:var(--violet-text)}
+.exp-block[data-tone="sunset"]   .picto{color:var(--sunset-text)}
+.exp-block[data-tone="sky"]      .picto{color:var(--sky-text)}
+
+/* Picto de section, posé À L'INTÉRIEUR du surtitre.
+   En frère du surtitre il devenait une boîte à part, et selon que le
+   surtitre est en block, inline-block ou inline-flex il se retrouvait sur
+   la ligne du dessus : mesuré à 12 cas sur 15 sur l'accueil. À l'intérieur,
+   il suit le texte quel que soit le display du parent.
+   20 px : la plus petite des trois tailles du styleguide (20/24/40). En em
+   il suivait le corps du surtitre — 11,5 px — et tombait à 14 px, trop
+   discret pour se voir. En rem il garde sa taille quel que soit le surtitre. */
+.picto-slot[data-picto]{--picto-taille:1.25rem;margin-right:.55rem;
+  vertical-align:-.42em}
+/* Le picto d'un surtitre prend l'encre de son surtitre.
+   `.picto` impose `var(--dz-accent, var(--fg))`, c'est-à-dire du noir. Sur
+   fond clair le surtitre vaut lui aussi `--fg` : rien ne change. Mais les
+   sections de nuit passent leur surtitre en `--night-fg` sans que le picto
+   suive — il restait noir sur noir, donc invisible. C'était le cas sur au
+   moins neuf sections du site.
+   La règle porte sur `.eyebrow` et non sur `.picto` : c'est bien le surtitre
+   qui commande son propre pictogramme, et les pictos hors surtitre gardent
+   leur comportement. */
+.eyebrow .picto-slot[data-picto]{color:inherit}
+
+/* Picto de puce — remplace la coche des listes à intitulé. Même gabarit que
+   la coche qu'il remplace, pour que l'alignement des listes ne bouge pas. */
+.picto-puce[data-picto]{--picto-taille:1.15rem;margin:0;vertical-align:-.2em}

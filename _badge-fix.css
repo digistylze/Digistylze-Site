@@ -1,0 +1,69 @@
+/* ============================================================
+   BADGES DE TARIF — « la plaque encochée dans le rail »
+   ============================================================ */
+.pr-grille .pr-carte{
+  --pr-rail:28px;
+  --pr-badge-h:30px;
+  --pr-card-bg:var(--card);
+  --pr-rail-col:rgba(16,17,20,.20);
+  background-color:var(--pr-card-bg);
+  background-image:linear-gradient(var(--pr-rail-col),var(--pr-rail-col));
+  background-repeat:no-repeat;
+  background-origin:border-box;
+  background-size:100% 1px;
+  background-position:0 var(--pr-rail);
+  padding-top:calc(var(--pr-rail) + var(--pr-badge-h) / 2 + 18px);
+}
+.pr-grille .pr-carte--vedette{
+  --pr-card-bg:var(--nuit);
+  --pr-rail-col:rgba(246,244,236,.17);
+}
+.pr-badge{
+  position:absolute; z-index:2;
+  left:50%;
+  top:calc(var(--pr-rail) - var(--pr-badge-h) / 2);
+  transform:translateX(-50%);
+  display:inline-flex; align-items:center; justify-content:center; gap:7px;
+  height:var(--pr-badge-h);
+  padding:0 15px 0 calc(15px + .16em);
+  border-radius:8.5px;
+  background:#101114; color:#F6F4EC;
+  font-family:var(--f-mono); font-weight:600;
+  font-size:11.5px; line-height:1; letter-spacing:.16em;
+  text-transform:uppercase; white-space:nowrap;
+  box-shadow:
+    0 0 0 4px var(--pr-card-bg),
+    0 7px 16px -9px rgba(16,17,20,.62),
+    inset 0 1px 0 rgba(246,244,236,.14);
+}
+.pr-carte--vedette .pr-badge{
+  background:#F6F4EC; color:#101114;
+  padding:0 15px;
+  box-shadow:
+    0 0 0 4px var(--pr-card-bg),
+    inset 0 -1px 0 rgba(16,17,20,.12);
+}
+.pr-badge svg{
+  width:12px; height:12px; flex:none;
+  fill:currentColor; stroke:none;
+  margin-left:-.16em;
+}
+@media (min-width:900px){
+  .pr-grille .pr-carte{--pr-rail:30px; --pr-badge-h:28px}
+  .pr-badge{font-size:10.5px; letter-spacing:.13em; border-radius:8px;
+    padding:0 15px 0 calc(15px + .13em)}
+  .pr-carte--vedette .pr-badge{padding:0 15px}
+  .pr-badge svg{width:11px; height:11px; margin-left:-.13em}
+}
+@media (min-width:1120px){
+  .pr-badge{font-size:11px; letter-spacing:.15em;
+    padding:0 16px 0 calc(16px + .15em)}
+  .pr-carte--vedette .pr-badge{padding:0 16px}
+  .pr-badge svg{margin-left:-.15em}
+}
+@media (max-width:359px){
+  .pr-badge{font-size:10.5px; letter-spacing:.13em;
+    padding:0 13px 0 calc(13px + .13em)}
+  .pr-carte--vedette .pr-badge{padding:0 13px}
+  .pr-badge svg{margin-left:-.13em}
+}

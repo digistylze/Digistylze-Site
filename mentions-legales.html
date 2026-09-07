@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script>document.documentElement.classList.add('wf-js')</script>
+<title>Mentions légales | Digistylze</title>
+<meta name="description" content="Mentions légales du site Digistylze : éditeur, forme juridique, hébergement, propriété intellectuelle et crédits. Digistylze Sàrl, Rue De-Candolle 20, 1205 Genève.">
+<link rel="icon" type="image/svg+xml" href="assets/img/logo/mark-black.svg">
+<!-- Open Graph -->
+<meta property="og:title" content="Mentions légales | Digistylze">
+<meta property="og:description" content="Mentions légales du site Digistylze : éditeur, forme juridique, hébergement, propriété intellectuelle et crédits.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_CH">
+<!-- JSON-LD schema.org -->
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "BreadcrumbList",
+ "itemListElement": [
+ { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://digistylze.ch/" },
+ { "@type": "ListItem", "position": 2, "name": "Mentions légales", "item": "https://digistylze.ch/mentions-legales.html" }
+ ]
+}
+</script>
+<!-- Police : Kanit, seule famille du site (400/500/600/700) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- GOOGLE ADS CONVERSION TAG · à brancher : AW-XXXXXXX -->
+<!-- <script async src="https://www.googletagmanager.com/gtag/js?id=AW-XXXXXXX"></script>
+ <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+ gtag('js', new Date()); gtag('config', 'AW-XXXXXXX');</script> -->
+
+<link rel="stylesheet" href="assets/css/site.css?v=20260814a">
+<link rel="stylesheet" href="assets/css/pictos.css">
+<script id="motion-lib" defer src="assets/js/motion-one.js"></script>
+<style>
+/* ============================================================
+ PAGES LÉGALES, gabarit typographique sobre
+ ============================================================ */
+@keyframes fxRise{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+.lg-hero{background:var(--canvas);border-bottom:1px solid var(--line-soft);
+ padding:clamp(3rem,6vh,4rem) var(--gutter) clamp(2rem,4vw,2.8rem)}
+.lg-hero__inner{max-width:var(--maxw-col);margin:0 auto}
+.lg-hero .eyebrow{display:inline-block;margin-bottom:.7rem;
+ animation:fxRise .7s var(--ease-back) .05s backwards}
+.lg-hero h1{font-size:clamp(2rem,4.6vw,3.2rem);font-weight:700;letter-spacing:-.03em;
+ line-height:1.05;animation:fxRise .7s var(--ease-back) .12s backwards}
+.lg-hero p{margin-top:.7rem;color:var(--muted);font-weight:400;font-size:.9rem;
+ animation:fxRise .7s var(--ease-back) .2s backwards}
+.lg{background:var(--bg);padding:clamp(2.6rem,5vw,3.8rem) var(--gutter) var(--section-y)}
+.lg__inner{max-width:var(--maxw-col);margin:0 auto;display:grid;
+ grid-template-columns:15rem 1fr;gap:clamp(2rem,5vw,3.5rem);align-items:start}
+.lg-toc{position:sticky;top:5.6rem}
+.lg-toc h2{font-size:.66rem;font-weight:600;
+ letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.9rem}
+.lg-toc ol{display:flex;flex-direction:column;gap:.4rem;counter-reset:toc}
+.lg-toc li{counter-increment:toc}
+.lg-toc a{display:flex;align-items:baseline;gap:.55rem;font-size:.86rem;font-weight:400;
+ color:var(--fg-soft);padding:.15rem 0;transition:color .2s}
+.lg-toc a::before{content:counter(toc,decimal-leading-zero);
+ font-size:.68rem;font-weight:600;color:var(--muted)}
+.lg-toc a:hover{color:var(--fg)}
+.lg-body section{padding:1.9rem 0;border-top:1px solid var(--line-soft);
+ scroll-margin-top:5.5rem}
+.lg-body section:first-child{border-top:0;padding-top:0}
+.lg-body h2{font-size:1.3rem;font-weight:600;letter-spacing:-.02em;margin-bottom:.8rem}
+.lg-num{display:block;font-size:.68rem;font-weight:600;
+ letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem}
+.lg-body p{color:var(--fg-soft);font-weight:400;line-height:1.7;font-size:.97rem}
+.lg-body p+p,.lg-body ul+p{margin-top:.65rem}
+.lg-body b{font-weight:600;color:var(--fg)}
+.lg-body ul{margin-top:.65rem;display:flex;flex-direction:column;gap:.4rem}
+.lg-body li{display:flex;gap:.6rem;color:var(--fg-soft);font-weight:400;
+ font-size:.95rem;line-height:1.55}
+.lg-body li::before{content:", ";color:var(--muted);flex:0 0 auto}
+.lg-body a{font-weight:600;color:var(--fg);text-decoration:underline;
+ text-underline-offset:3px}
+.lg-body .lg-todo{display:inline-block;margin-top:.5rem;font-size:.74rem;font-weight:600;line-height:1.6;color:var(--sunshine-text);
+ background:#FFF9E3;border:1px dashed #E6D089;border-radius:.55rem;padding:.6rem .85rem}
+.lg-body .lg-note{margin-top:2.2rem;padding:1rem 1.2rem;border:1px dashed var(--line);
+ border-radius:.7rem;font-size:.74rem;color:var(--muted)}
+@media (max-width:860px){
+ .lg__inner{grid-template-columns:1fr}
+ .lg-toc{position:static;background:var(--canvas);border:1px solid var(--line);
+ border-radius:.8rem;padding:1.1rem 1.2rem}
+}
+</style>
+</head>
+<body data-page="mentions-legales.html">
+
+<!-- PRELOADER -->
+<div class="loader" id="loader" aria-hidden="true">
+ <svg class="loader__logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+ <circle class="loader__circle" cx="50" cy="50" r="45"/>
+ </svg>
+ <span class="loader__word">Digistylze</span>
+</div>
+
+<!-- ============================================================
+ NAVIGATION · nav-megamenu-hover
+ ============================================================ -->
+<!-- HEADER v2 · LA CAPSULE (2026-08-13). Trois états, tous posés
+ par fx.js : `is-haut` (page en haut : le filet s'efface),
+ `is-flot` (défilement : l'intérieur se détache en capsule de
+ verre). Sans fx.js le bandeau garde exactement sa forme d'avant.
+ LE LOGO : l'icône seule ; au survol (pointeur fin), le rouleau
+ déroule les services et se pose sur le wordmark · la figure du
+ logo-roll de nk.studio. Sans JS : icône + wordmark statiques,
+ rien n'est masqué. Le rouleau est aria-hidden : le nom accessible
+ reste l'aria-label du lien. -->
+<header class="header header--v2">
+ <div class="header__inner">
+ <a class="logo logo--roll" href="index.html" aria-label="Digistylze, accueil">
+ <img class="logo__mark" src="assets/img/logo/mark-black.svg" alt="" width="34" height="34">
+ <span class="logo__mask" aria-hidden="true">
+ <span class="logo__roue" data-logo-roue>
+ <i>Site web</i><i>Publicité</i><i>SEO &amp; GEO</i><i>Branding</i><i>Social media</i><i>SaaS &amp; Apps</i>
+ <img src="assets/img/logo/logo-texte.svg" alt="" width="121" height="21">
+ </span>
+ </span>
+ </a>
+ <nav aria-label="Navigation principale">
+ <ul class="mm" id="mm"><!-- rendu par JS --></ul>
+ </nav>
+ <div class="actions">
+ <a href="contact.html" class="cta" id="cta-nav" data-conversion="lead-cta-nav">Audit gratuit</a>
+ </div>
+ </div>
+</header>
+
+<main>
+
+<!-- ============================================================
+ HERO · MENTIONS LÉGALES
+ ============================================================ -->
+<section class="lg-hero">
+ <div class="lg-hero__inner">
+ <span class="eyebrow"><span class="picto-slot" data-picto="devis"></span>Informations légales</span>
+ <h1>Mentions légales</h1>
+ <p>Dernière mise à jour&nbsp;: 3 août 2026</p>
+ </div>
+</section>
+
+<!-- ============================================================
+ CORPS · SOMMAIRE ANCRÉ + SECTIONS
+ ============================================================ -->
+<div class="lg">
+ <div class="lg__inner">
+
+ <nav class="lg-toc" aria-label="Sommaire">
+ <h2>Sommaire</h2>
+ <ol>
+ <li><a href="#editeur">Éditeur</a></li>
+ <li><a href="#forme-juridique">Forme juridique &amp; IDE</a></li>
+ <li><a href="#hebergement">Hébergement</a></li>
+ <li><a href="#propriete-intellectuelle">Propriété intellectuelle</a></li>
+ <li><a href="#credits">Crédits</a></li>
+ </ol>
+ </nav>
+
+ <div class="lg-body">
+ <section id="editeur">
+ <h2><span class="lg-num">01</span>Éditeur</h2>
+ <p>Le présent site est édité par&nbsp;:</p>
+ <p><b>Digistylze Sàrl</b><br>Rue De-Candolle 20<br>1205 Genève · Suisse</p>
+ <p>Email&nbsp;: <a href="mailto:agence@digistylze.ch">agence@digistylze.ch</a><br>
+ Téléphone&nbsp;: <a href="tel:+41225068276">+41 22 506 82 76</a></p>
+ </section>
+
+ <section id="forme-juridique">
+ <h2><span class="lg-num">02</span>Forme juridique &amp; IDE</h2>
+ <p>Digistylze est une société à responsabilité limitée (Sàrl) de droit suisse, inscrite au registre du commerce du canton de Genève depuis le 14&nbsp;juin&nbsp;2024.</p>
+ <p>IDE/TVA&nbsp;: CHE-158.988.442<br>
+ Numéro au registre du commerce&nbsp;: CH-660.2.038.024-7</p>
+ <p>Fiche société&nbsp;: <a href="https://www.moneyhouse.ch/fr/company/digistylze-sarl-17927922751" target="_blank" rel="noopener">Digistylze Sàrl sur Moneyhouse</a></p>
+ </section>
+
+ <section id="hebergement">
+ <h2><span class="lg-num">03</span>Hébergement</h2>
+ <p>Les informations relatives à l'hébergeur du site figureront ici.</p>
+ <p class="lg-todo">[À compléter par le client&nbsp;: nom, adresse et coordonnées de l'hébergeur]</p>
+ </section>
+
+ <section id="propriete-intellectuelle">
+ <h2><span class="lg-num">04</span>Propriété intellectuelle</h2>
+ <p>L'ensemble des contenus de ce site, textes, visuels, logos, éléments graphiques et mises en page, ainsi que les marques et signes distinctifs Digistylze sont la propriété exclusive de Digistylze Sàrl.</p>
+ <p>Toute reproduction, représentation, modification ou diffusion, totale ou partielle, est interdite sans accord préalable écrit de Digistylze Sàrl.</p>
+ </section>
+
+ <section id="credits">
+ <h2><span class="lg-num">05</span>Crédits</h2>
+ <p>Design &amp; développement&nbsp;: <a href="index.html">Digistylze</a>.</p>
+ </section>
+ </div>
+
+ </div>
+</div>
+
+</main>
+
+<!-- ============================================================
+ SECTION 12 · FOOTER (structure v2)
+ ============================================================ -->
+<footer class="ft">
+ <div class="ft__inner">
+ <div class="ft__top">
+ <div class="ft__brand wf-rev">
+ <img src="assets/img/logo/logo-white.svg" alt="Digistylze" width="132" height="22">
+ <p>Agence digitale à Genève. Un seul partenaire pour tout votre digital.</p>
+ <div class="ft__contact">
+ <span>Rue De-Candolle 20, 1205 Genève</span>
+ <a href="tel:+41225068276">+41 22 506 82 76</a>
+ <a href="mailto:agence@digistylze.ch">agence@digistylze.ch</a>
+ </div>
+ <div class="ft__badges" aria-label="Membre de">
+ <span>CCIG</span><span>BNI</span>
+ </div>
+ </div>
+ <div class="ft__col wf-rev" style="--d:.08s"><h3>Services</h3><ul>
+ <li><a href="creation-site-web.html">Création de site web</a></li>
+ <li><a href="publicite-en-ligne.html">Publicité en ligne</a></li>
+ <li><a href="agence-seo.html">SEO &amp; GEO</a></li>
+ <li><a href="branding.html">Branding &amp; identité visuelle</a></li>
+ <li><a href="community-management.html">Community management</a></li>
+ <li><a href="saas-applications.html">Logiciel métier &amp; applications</a></li>
+ <li><a href="agence-google-ads.html">Google Ads</a></li>
+ <li><a href="agence-meta-ads.html">Meta Ads</a></li>
+ <li><a href="agence-linkedin-ads.html">LinkedIn Ads</a></li>
+ <li><a href="agence-tiktok-ads.html">TikTok Ads</a></li>
+ </ul></div>
+ <div class="ft__col wf-rev" style="--d:.16s"><h3>Agence</h3><ul>
+ <li><a href="realisations.html">Réalisations</a></li>
+ <li><a href="agence.html">Agence</a></li>
+ <li><a href="tarifs.html">Tarifs</a></li>
+ <li><a href="contact.html">Contact</a></li>
+ </ul></div>
+ <div class="ft__col wf-rev" style="--d:.24s"><h3>Suivez-nous</h3><ul>
+ <li><a href="https://www.instagram.com/digistylze/" target="_blank" rel="noopener">Instagram</a></li>
+ <li><a href="https://www.linkedin.com/company/agence-digistylze-suisse/" target="_blank" rel="noopener">LinkedIn</a></li>
+ <li><a href="https://www.facebook.com/profile.php?id=61560639704667" target="_blank" rel="noopener">Facebook</a></li>
+ </ul></div>
+ </div>
+
+
+ <div class="ft__meta">
+ <span>© 2026 Digistylze Sàrl</span>
+ <nav aria-label="Liens légaux">
+ <a href="mentions-legales.html">Mentions légales</a>
+ <a href="politique-de-confidentialite.html">Politique de confidentialité</a>
+ </nav>
+ </div>
+ </div>
+ <div class="ft__filet" aria-hidden="true"></div>
+</footer>
+
+<!-- WIDGET FLOTTANT · WhatsApp + devis -->
+<div class="float-widget" id="floatWidget">
+ <a class="float-btn float-wa" href="https://wa.me/41225068276?text=Bonjour%2C%20j%27aimerais%20parler%20de%20mon%20projet." target="_blank" rel="noopener" aria-label="Discuter sur WhatsApp">
+ <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+ </a>
+ <button class="float-btn float-devis" type="button" id="floatDevis" aria-label="Demander un devis">
+ <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+ <span class="float-devis__text">Demander un devis</span>
+ </button>
+</div>
+
+<div class="fw-modal" id="modalDevis" role="dialog" aria-modal="true" aria-labelledby="modalDevisTitle">
+ <div class="fw-modal__backdrop" data-close-modal></div>
+ <div class="fw-modal__dialog">
+ <button class="fw-modal__close" type="button" data-close-modal aria-label="Fermer">
+ <svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+ </button>
+ <p class="fw-modal__eyebrow">Demande de devis</p>
+ <h3 class="fw-modal__title" id="modalDevisTitle">Parlons de votre projet.</h3>
+ <p class="fw-modal__sub">Gratuit, sans engagement, réponse sous 24&nbsp;h ouvrées.</p>
+ <form class="fw-form" id="devisForm" name="devis-form" novalidate>
+ <div class="fw-form__row">
+ <div class="fw-form__group">
+ <label class="fw-form__label" for="m-nom">Nom *</label>
+ <input class="fw-form__input" id="m-nom" name="nom" type="text" autocomplete="name" required>
+ </div>
+ <div class="fw-form__group">
+ <label class="fw-form__label" for="m-email">E-mail *</label>
+ <input class="fw-form__input" id="m-email" name="email" type="email" autocomplete="email" required>
+ </div>
+ </div>
+ <div class="fw-form__group">
+ <label class="fw-form__label" for="m-msg">Votre projet en quelques lignes *</label>
+ <textarea class="fw-form__textarea" id="m-msg" name="message" required></textarea>
+ </div>
+ <button type="submit" class="fw-form__btn" data-conversion="lead-devis-submit">
+ Envoyer
+ <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+ </button>
+ <p class="fw-form__note">Vos données sont utilisées uniquement pour traiter votre demande.</p>
+ <p class="fw-form__success" role="status">Merci, c'est bien reçu. On revient vers vous sous 24&nbsp;h ouvrées.</p>
+ </form>
+ </div>
+</div>
+
+<script src="assets/js/site.js?v=20260813f"></script>
+<script src="assets/js/pictos.js"></script>
+<script src="assets/js/picto.js"></script>
+<script src="assets/js/motion.js"></script>
+<script>
+
+</script>
+
+</body>
+</html>

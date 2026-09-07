@@ -1,0 +1,268 @@
+/* ================================================================
+   DIGISTYLZE — APERÇU DE PROJET
+   ================================================================
+   Le clic sur une carte de réalisation ouvrait le site en nouvel onglet :
+   on perdait le visiteur au premier regard. Il voit d'abord le site ici,
+   et décide ensuite d'y aller.
+
+   D'OÙ VIENT CE FICHIER
+   La modale existait déjà, écrite dans le `<style>` et le `<script>` de
+   `realisations.html`. Elle n'y montrait une page parcourable que pour les
+   trois projets qui disposaient d'une capture longue ; les neuf autres
+   n'avaient qu'une vignette de 720×506 figée. Et `creation-site-web.html`,
+   qui présente les mêmes projets, n'avait pas de modale du tout.
+
+   Sortie ici, elle sert les deux pages et montre désormais une capture de
+   la page d'accueil ENTIÈRE, que l'on parcourt dans la modale. Le passage
+   par une iframe du site réel a été essayé puis abandonné : plusieurs sites
+   ne s'y affichaient pas, deux le refusent par en-tête. Voir
+   `assets/js/apercu.js` pour cet arbitrage.
+
+   Points de rupture : 1120 / 960 / 860 / 720 / 640 / 520, et rien d'autre.
+   ================================================================ */
+
+.pv{position:fixed;inset:0;z-index:120;display:flex;align-items:center;
+  justify-content:center;padding:clamp(.75rem,3vw,2rem)}
+.pv[hidden]{display:none}
+.pv__scrim{position:absolute;inset:0;background:rgba(14,14,18,.62);
+  backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+  animation:pvFade .25s var(--ease) both}
+/* HAUTEUR DÉFINIE, ET NON `max-height`.
+   Avec une hauteur automatique, le dialogue se dimensionnait sur son
+   contenu. Une capture de 11 244px de haut donnerait donc un dialogue de
+   11 244px : c'est la scène qui doit défiler, pas le dialogue qui doit
+   grandir. Une hauteur définie donne au passage la même boîte à tous les
+   projets — un visualiseur qui change de taille selon le site ne fait
+   pas sérieux. */
+.pv__dialog{position:relative;z-index:1;width:100%;max-width:64rem;
+  height:min(calc(100dvh - 2rem),52rem);display:flex;flex-direction:column;
+  background:var(--bg);border-radius:var(--radius-lg);overflow:hidden;
+  box-shadow:0 30px 70px -20px rgba(0,0,0,.45);
+  animation:pvRise .34s var(--ease-out) both}
+@keyframes pvFade{from{opacity:0}to{opacity:1}}
+@keyframes pvRise{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:none}}
+.pv__head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;
+  padding:1.2rem 1.3rem 1.1rem;border-bottom:1px solid var(--line-soft);flex-shrink:0}
+/* Le monogramme ouvre l'en-tête : la première lettre du projet dans une
+   tuile au dégradé du domaine — l'aperçu a un visage avant d'avoir un
+   pixel de site. */
+.pv__head-main{display:flex;align-items:flex-start;gap:.95rem;min-width:0}
+.pv__mono{flex:none;width:3rem;height:3rem;border-radius:.9rem;
+  display:grid;place-items:center;background:var(--grad-coral);color:#fff;
+  font-weight:700;font-size:1.2rem;box-shadow:var(--shadow-md)}
+.pv__tag{display:inline-block;font-size:.6rem;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--coral-text)}
+.pv__title{margin-top:.15rem;font-size:clamp(1.15rem,2.4vw,1.5rem);font-weight:600;
+  letter-spacing:-.02em;line-height:1.15}
+.pv__meta{margin-top:.2rem;font-size:.88rem;color:var(--muted);font-weight:400}
+/* Rangées de méta à pictos : secteur, lieu, résultat — chaque information
+   entre par sa forme, plus par une ligne de texte à points médians. */
+.pv__meta--rows{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.55rem}
+.pv__meta-row{display:inline-flex;align-items:center;gap:.45rem;
+  font-size:.78rem;font-weight:500;color:var(--fg-soft);
+  background:var(--canvas);border:1px solid var(--line-soft);
+  border-radius:99px;padding:.32rem .8rem;white-space:nowrap}
+.pv__meta-row .picto{--picto-taille:.95rem;color:var(--muted);margin:0;vertical-align:0}
+.pv__close{flex-shrink:0;width:2.75rem;height:2.75rem;border:0;background:var(--canvas-2);
+  border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:var(--fg);transition:background .2s,transform .2s var(--ease-out)}
+.pv__close:hover{background:var(--line);transform:rotate(90deg)}
+.pv__close svg{width:1rem;height:1rem}
+.pv__frame{flex:1;min-height:0;display:flex;flex-direction:column;
+  margin:0 1.3rem;border:1px solid var(--line);border-radius:.7rem;overflow:hidden;
+  background:var(--canvas-2)}
+.pv__bar{display:flex;align-items:center;gap:.3rem;padding:.5rem .7rem;flex-shrink:0;
+  background:var(--canvas);border-bottom:1px solid var(--line-soft)}
+.pv__bar i{width:.5rem;height:.5rem;border-radius:50%;background:var(--line);flex-shrink:0}
+/* L'adresse en pilule centrée, comme une vraie barre de navigateur : le
+   cadre dit « vous êtes sur le site du client ». */
+.pv__bar b{flex:1;margin:0 .6rem;max-width:26rem;text-align:center;
+  font-size:.66rem;font-weight:500;color:var(--fg-soft);
+  background:var(--bg);border:1px solid var(--line-soft);border-radius:99px;
+  padding:.28rem .9rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* LA SCÈNE — un seul occupant : une image très haute, et elle défile.
+   `overscroll-behavior:contain` empêche la page derrière de se mettre à
+   défiler quand on atteint le bas de la capture. */
+.pv__scene{position:relative;flex:1;min-height:0;background:#fff;
+  overflow-y:auto;overscroll-behavior:contain}
+.pv__scroll img{width:100%;display:block}
+
+/* MODE EMBED — le site réel dans son cadre, navigable. La scène cesse de
+   défiler : c'est l'iframe qui porte son propre défilement. */
+.pv__iframe{display:none}
+.pv__scene[data-mode="embed"]{overflow:hidden}
+.pv__scene[data-mode="embed"] .pv__scroll{display:none}
+.pv__scene[data-mode="embed"] .pv__iframe{display:block;height:100%}
+.pv__iframe iframe{display:block;width:100%;height:100%;border:0;background:#fff}
+/* Voile de chargement : fond + anneau qui tourne, retiré au `load`. */
+.pv__scene.is-loading::before{content:"";position:absolute;inset:0;z-index:3;
+  background:var(--canvas-2)}
+.pv__scene.is-loading::after{content:"";position:absolute;z-index:4;
+  top:calc(50% - 1.1rem);left:calc(50% - 1.1rem);width:2.2rem;height:2.2rem;
+  border-radius:50%;border:3px solid var(--line);border-top-color:var(--fg);
+  animation:pvSpin .8s linear infinite}
+@keyframes pvSpin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){
+  .pv__scene.is-loading::after{animation-duration:1.6s}
+}
+/* La vignette seule n'a pas de hauteur à parcourir : on la centre au lieu
+   de l'étirer jusqu'au flou. */
+.pv__scene[data-mode="vignette"]{display:grid;place-items:center;overflow:hidden;padding:clamp(1rem,3vw,2rem);
+  background:var(--canvas-2)}
+.pv__scene[data-mode="vignette"] img{width:100%;max-width:44rem;height:auto;
+  border-radius:.5rem;box-shadow:var(--shadow-md)}
+
+
+.pv__foot{display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  flex-wrap:wrap;padding:1rem 1.3rem 1.2rem;flex-shrink:0}
+.pv__hint{font-size:.66rem;color:var(--muted);max-width:34rem;line-height:1.45}
+
+/* ================================================================
+   PANNEAU D'ÉTUDE DE CAS
+   ================================================================
+   L'aperçu à gauche, les chiffres à droite. Tant qu'un projet n'a pas
+   de fiche, `.pv__body--cas` n'est pas posée et la modale garde sa
+   colonne unique d'avant — c'est ce qui laisse creation-site-web.html
+   inchangé.
+   ================================================================ */
+/* `.pv__bar` porte `display:flex` et `.btn-pill` un `display:inline-flex` :
+   deux styles AUTEUR, qui l'emportent sur le `[hidden]{display:none}` de la
+   feuille du navigateur. Sans ces deux lignes, la fausse barre d'adresse et le
+   bouton « Ouvrir le site » restaient affichés sur les projets qui n'ont aucune
+   URL — annonçant un site qui n'existe pas. Même piège que `.g-card[hidden]`
+   dans realisations.html. */
+.pv__bar[hidden],.pv__foot [data-pv-live][hidden]{display:none}
+
+.pv__body{flex:1;min-height:0;display:flex;flex-direction:column}
+.pv__body--cas{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);
+  gap:0;align-items:stretch}
+/* Le dialogue s'élargit uniquement quand il y a deux colonnes : à
+   64rem elles seraient toutes deux trop étroites, à 78rem une colonne
+   seule serait une bande vide. */
+.pv:has(.pv__body--cas) .pv__dialog{max-width:78rem}
+.pv__body--cas .pv__frame{margin:0 0 0 1.3rem}
+
+/* Panneau clair. Le fond sombre isolait la colonne du reste de la
+   modale, dont l'en-tête et le pied sont sur `--bg` : la coupure se
+   voyait plus que le contenu. En clair, c'est le filet de gauche qui
+   sépare les deux colonnes, et la hiérarchie passe par le contraste
+   de graisse — la convention du reste du site. */
+.pv__cas{display:flex;flex-direction:column;gap:.9rem;min-height:0;
+  padding:1.3rem;overflow-y:auto;overscroll-behavior:contain;
+  background:var(--canvas);color:var(--fg);border-left:1px solid var(--line)}
+.pv__cas[hidden]{display:none}
+.pv__cas-intro{font-size:.9rem;line-height:1.6;color:var(--fg-soft)}
+
+/* Tuiles sur le modèle des cartes claires du site : fond `--bg`,
+   filet `--line`, même rayon. */
+.pv__kpis{display:grid;gap:.6rem}
+.pv__kpi{background:var(--bg);border:1px solid var(--line);
+  border-radius:.6rem;padding:.7rem .8rem}
+.pv__kpi b{display:block;font-size:1.05rem;font-weight:600;letter-spacing:-.02em;
+  color:var(--fg);line-height:1.2}
+.pv__kpi span{display:block;margin-top:.15rem;font-size:.56rem;letter-spacing:.06em;
+  line-height:1.3;text-transform:uppercase;color:var(--muted)}
+
+.pv__cas-sections{display:flex;flex-direction:column;gap:.8rem}
+.pv__cas-bloc h4{font-size:.6rem;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:.25rem}
+.pv__cas-bloc p{font-size:.82rem;line-height:1.6;color:var(--fg-soft)}
+
+/* Clone du dashboard ou de la sparkline, pour publicité et SEO. Le
+   mode est porté par .pv__scene : c'est lui qui décide laquelle des
+   deux zones s'affiche, plutôt que l'attribut `hidden` — `.pv__scroll
+   img` a `display:block`, un style auteur qui l'emporterait dessus. */
+.pv__clone{display:none}
+.pv__scene[data-mode="clone"]{display:grid;place-items:center;overflow:hidden;
+  padding:clamp(1rem,3vw,2rem);background:var(--canvas-2)}
+.pv__scene[data-mode="clone"] .pv__scroll{display:none}
+.pv__scene[data-mode="clone"] .pv__clone{display:block;width:100%;max-width:30rem}
+.pv__scene[data-mode="vide"] .pv__scroll{display:none}
+/* Le clone hérite des marges de la carte : on les neutralise. */
+.pv__clone .g-dash,.pv__clone .g-spark{margin:0;width:100%}
+/* Ces deux visuels sont animés À L'ENTRÉE dans la grille : les barres partent
+   à `scaleY(0)` et le tracé à `stroke-dashoffset:260`, et ne sont révélés que
+   sous `.g-card.is-in`. Le clone vit dans la modale, hors de cette portée — il
+   restait donc parfaitement invisible. Ici c'est un aperçu figé, pas une
+   entrée en scène : on le pose directement à son état final. */
+.pv__clone .mockdash__bars i{transform:scaleY(1)}
+.pv__clone .g-spark path{stroke-dashoffset:0}
+
+@media (max-width:960px){
+  /* Empilé : l'aperçu d'abord, les chiffres dessous. Le dialogue reprend
+     sa largeur normale, deux colonnes n'y tiennent plus. */
+  .pv:has(.pv__body--cas) .pv__dialog{max-width:64rem}
+  .pv__body--cas{grid-template-columns:1fr;grid-template-rows:minmax(12rem,1fr) auto;
+    overflow-y:auto;overscroll-behavior:contain}
+  .pv__body--cas .pv__frame{margin:0 1.3rem}
+  .pv__cas{overflow:visible}
+}
+@media (max-width:640px){
+  .pv{padding:0}
+  .pv__dialog{max-width:none;max-height:100dvh;height:100dvh;border-radius:0}
+  .pv__frame{margin:0 1rem}
+  .pv__body--cas .pv__frame{margin:0 1rem}
+}
+@media (prefers-reduced-motion:reduce){
+  .pv__scrim,.pv__dialog{animation:none}
+}
+
+/* ================================================================
+   MODALE v2 — L'ÉCRAN DE PROJECTION (refonte premium 2026-08)
+   ================================================================
+   La salle s'éteint : voile profond et flouté, dialogue en verre
+   nuit, et seul l'aperçu du site reste lumineux — c'est lui le
+   projeté. L'en-tête annonce le projet comme une affiche : titre
+   blanc, méta en capsules de verre. Écrit en surcharge à la fin
+   du fichier : à spécificité égale, la cascade nous donne raison,
+   et l'historique clair reste lisible au-dessus.
+   ================================================================ */
+.pv__scrim{background:rgba(10,10,14,.78);
+  backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}
+.pv__dialog{background:linear-gradient(168deg,#1C1C24 0%,#131318 60%,#16161C 100%);
+  border:1px solid rgba(255,255,255,.12);border-radius:1.5rem;
+  color:var(--night-fg);
+  box-shadow:0 60px 140px -50px rgba(0,0,0,.92),
+    inset 0 1px 0 rgba(255,255,255,.09)}
+.pv__head{border-bottom-color:rgba(255,255,255,.1)}
+.pv__title{color:#fff}
+.pv__tag{color:#FBB78E}
+.pv__meta{color:var(--night-muted)}
+.pv__meta-row{background:rgba(255,255,255,.06);
+  border-color:rgba(255,255,255,.14);color:var(--night-fg);
+  font-size:.8rem}
+.pv__meta-row .picto{color:var(--night-muted)}
+.pv__mono{box-shadow:0 10px 26px -10px rgba(234,87,83,.55)}
+.pv__close{background:rgba(255,255,255,.08);color:#fff;
+  border:1px solid rgba(255,255,255,.14)}
+.pv__close:hover{background:rgba(255,255,255,.2)}
+/* Le cadre-projecteur : c'est lui qui reste clair et lumineux. */
+.pv__frame{border-color:rgba(255,255,255,.16);background:#101015;
+  box-shadow:0 30px 70px -40px rgba(0,0,0,.9)}
+.pv__bar{background:#17171C;border-bottom-color:rgba(255,255,255,.08)}
+.pv__bar i{background:rgba(255,255,255,.18)}
+.pv__bar i:nth-child(1){background:#F26D6A}
+.pv__bar i:nth-child(2){background:#F7C463}
+.pv__bar i:nth-child(3){background:#89CA8A}
+.pv__bar b{background:rgba(255,255,255,.06);
+  border-color:rgba(255,255,255,.12);color:var(--night-fg)}
+.pv__hint{color:var(--night-muted);font-size:.72rem}
+.pv__foot .btn-pill{background:#fff;color:var(--fg);
+  box-shadow:0 16px 40px -16px rgba(255,255,255,.3)}
+.pv__foot .btn-pill::before{display:none}
+.pv__foot .btn-pill svg{background:var(--fg);color:#fff}
+.pv__scene.is-loading::before{background:#101015}
+.pv__scene.is-loading::after{border-color:rgba(255,255,255,.18);
+  border-top-color:#fff}
+.pv__scene[data-mode="vignette"]{background:#101015}
+.pv__scene[data-mode="clone"]{background:#101015}
+/* L'étude de cas suit la salle : verre sombre, chiffres blancs. */
+.pv__cas{background:rgba(255,255,255,.03);
+  border-left-color:rgba(255,255,255,.1);color:var(--night-fg)}
+.pv__cas-intro{color:var(--night-muted)}
+.pv__kpi{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12)}
+.pv__kpi b{color:#fff}
+.pv__kpi span{color:var(--night-muted)}
+.pv__cas-bloc h4{color:rgba(255,255,255,.55)}
+.pv__cas-bloc p{color:var(--night-muted)}

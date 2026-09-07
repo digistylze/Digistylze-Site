@@ -1,0 +1,7 @@
+# la sauvegarde de l'ancienne page d'accueil ne doit pas être servie publiquement
+*.bak
+
+# Les pages de travail *.refonte.html SONT publiées (mode « push direct » : le
+# client les teste en prod), mais chacune porte un <meta name="robots" noindex>
+# tant qu'elle vit sous ce suffixe — pas de contenu dupliqué indexable.
+# À la promotion : renommer en page finale + retirer le noindex.

@@ -1,0 +1,134 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&family=Martian+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+<title>tmp badge</title>
+<style>
+:root{--nuit:#0B0C0F;--paper:#F6F4EC;--card:#FFFFFF;--ink:#101114;--ink-soft:#2C2F35;
+--paper2:#F4F2EA;--steel2:#5B5F68;--rule2:#E4E2DA;
+--f-disp:"Kanit",system-ui,sans-serif;--f-mono:"Martian Mono",ui-monospace,monospace;
+--gut:clamp(20px,4vw,60px);--maxw:1200px}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--f-disp);line-height:1.6}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--gut)}
+.pr{background:var(--paper2);color:var(--ink);padding:clamp(30px,4vh,54px) 0 clamp(44px,5.5vh,80px)}
+.pr-head{max-width:64ch;margin:0 auto;text-align:center}
+.pr-title{margin:18px 0 0;font-size:clamp(26px,3.8vw,46px);line-height:1.05;font-weight:800;letter-spacing:-.03em}
+.pr-grille{display:grid;gap:clamp(14px,1.6vw,20px);align-items:stretch;margin-top:clamp(28px,3.6vh,48px);grid-template-columns:1fr}
+@media (min-width:900px){.pr-grille{grid-template-columns:repeat(3,1fr)}}
+.pr-carte{position:relative;display:flex;flex-direction:column;
+  padding:clamp(30px,3vw,38px) clamp(22px,2.2vw,30px) clamp(22px,2.2vw,30px);
+  border-radius:22px;background:var(--card);border:1px solid var(--rule2);
+  box-shadow:0 24px 52px -42px rgba(16,17,20,.42)}
+.pr-carte--vedette{background:var(--nuit);border-color:transparent;color:var(--paper);
+  box-shadow:0 34px 66px -40px rgba(11,12,15,.8)}
+.pr-ligne-tete{display:flex;align-items:center;gap:14px}
+.pr-tuile{display:grid;place-items:center;width:52px;height:52px;flex:none;border-radius:15px;background:var(--paper2);border:1px solid var(--rule2)}
+.pr-carte--vedette .pr-tuile{background:rgba(244,242,234,.08);border-color:rgba(244,242,234,.16)}
+.pr-tuile svg{width:25px;height:25px;fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.pr-carte--vedette .pr-tuile svg{stroke:var(--paper)}
+.pr-nom{margin:0;font-weight:800;letter-spacing:-.022em;font-size:clamp(20px,2.1vw,26px);line-height:1.15}
+.pr-carte--vedette .pr-nom{color:var(--paper)}
+.pr-prix{margin:16px 0 0;display:flex;flex-direction:column;gap:2px}
+.pr-prix-av{font-family:var(--f-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--steel2)}
+.pr-prix-ligne strong{font-weight:800;letter-spacing:-.032em;font-size:clamp(34px,3.8vw,46px);line-height:1}
+.pr-desc{margin:14px 0 0;font-size:13.5px;line-height:1.55;color:var(--ink-soft)}
+.pr-carte--vedette .pr-desc{color:rgba(244,242,234,.82)}
+.pr-incl{margin:20px 0 0;padding-top:18px;border-top:1px solid var(--rule2);font-family:var(--f-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--steel2)}
+.pr-carte--vedette .pr-incl{border-top-color:rgba(244,242,234,.14);color:rgba(244,242,234,.6)}
+.pr-liste{list-style:none;margin:12px 0 0;padding:0}
+.pr-liste li{display:flex;align-items:flex-start;gap:10px;padding:5px 0;font-size:13.5px;line-height:1.45;color:var(--ink-soft)}
+.pr-carte--vedette .pr-liste li{color:rgba(244,242,234,.86)}
+.pr-ck{display:grid;place-items:center;width:18px;height:18px;flex:none;margin-top:1px;border-radius:50%;background:rgba(30,154,92,.14)}
+.pr-ck svg{width:11px;height:11px;fill:none;stroke:#1E9A5C;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}
+.pr-carte--vedette .pr-ck{background:rgba(76,195,138,.18)}
+.pr-carte--vedette .pr-ck svg{stroke:#4CC38A}
+.pr-cta{margin-top:auto;width:100%;display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  border-radius:999px;padding:15px 22px;background:transparent;color:var(--ink);border:1px solid var(--rule2);
+  font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;line-height:1}
+.pr-carte--vedette .pr-cta{background:var(--paper);color:var(--ink);border-color:transparent}
+.pr-carte .pr-cta{margin-top:22px}
+@media (min-width:900px){.pr-carte .pr-cta{margin-top:auto}}
+
+/* ====== LA PLAQUE SCELLEE — une seule regle ====== */
+.pr-carte{container-type:inline-size}
+.pr-badge{
+  position:absolute; top:0; left:50%;
+  transform:translate(-50%,-50%);
+  z-index:2;
+  display:inline-flex; align-items:center; gap:.6em;
+  font-family:var(--f-mono); font-weight:600;
+  font-size:clamp(9.5px, 3.9cqi, 11px);
+  line-height:1; letter-spacing:.13em;
+  text-transform:uppercase; white-space:nowrap;
+  padding:.64em calc(1.2em - .065em) .64em calc(1.2em + .065em);
+  border-radius:7px;
+  background:var(--ink);
+  color:var(--paper);
+  box-shadow:0 0 0 4px var(--paper), 0 0 0 5px var(--ink);
+}
+.pr-carte--vedette .pr-badge{background:var(--ink); color:var(--paper)}
+.pr-badge svg{width:.95em;height:.95em;flex:none;fill:currentColor;stroke:none;margin-inline-start:-.13em}
+.pr-grille{margin-top:clamp(38px,3.6vh,48px)}
+@media (max-width:899px){.pr-grille{row-gap:44px}}
+</style></head>
+<body>
+<section class="pr"><div class="wrap">
+  <div class="pr-head"><h2 class="pr-title">Des offres claires, un prix annoncé</h2></div>
+  <div class="pr-grille">
+    <article class="pr-carte" id="c1">
+      <span class="pr-badge" id="b1">Idéal pour lancer</span>
+      <div class="pr-ligne-tete"><span class="pr-tuile"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/></svg></span><h3 class="pr-nom">Landing page</h3></div>
+      <div class="pr-prix"><em class="pr-prix-av">Dès</em><div class="pr-prix-ligne"><strong>1 900</strong></div></div>
+      <p class="pr-desc">Une page unique, taillée pour convertir un trafic payant.</p>
+      <p class="pr-incl">Ce qui est inclus</p>
+      <ul class="pr-liste"><li><span class="pr-ck"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span>Design sur mesure</li></ul>
+      <button class="pr-cta">Demander un devis</button>
+    </article>
+    <article class="pr-carte pr-carte--vedette" id="c2">
+      <span class="pr-badge" id="b2">Populaire<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.4l2.3 4.8 5.2.7-3.8 3.6 1 5.2-4.7-2.6-4.7 2.6 1-5.2L4.5 9.9l5.2-.7z"/></svg></span>
+      <div class="pr-ligne-tete"><span class="pr-tuile"><svg viewBox="0 0 24 24"><rect x="3.6" y="5.2" width="16.8" height="13.6" rx="2.4"/></svg></span><h3 class="pr-nom">Site vitrine</h3></div>
+      <div class="pr-prix"><em class="pr-prix-av">Dès</em><div class="pr-prix-ligne"><strong>4 900</strong></div></div>
+      <p class="pr-desc">Le site complet qui installe la marque et fait entrer les demandes.</p>
+      <p class="pr-incl">Ce qui est inclus</p>
+      <ul class="pr-liste"><li><span class="pr-ck"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span>Jusqu'à 8 pages</li><li><span class="pr-ck"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span>Rédaction incluse</li></ul>
+      <button class="pr-cta">Demander un devis</button>
+    </article>
+    <article class="pr-carte" id="c3">
+      <div class="pr-ligne-tete"><span class="pr-tuile"><svg viewBox="0 0 24 24"><path d="M3.4 4.6h2.3l2.1 9.8h9.3"/></svg></span><h3 class="pr-nom">Sur mesure</h3></div>
+      <div class="pr-prix"><em class="pr-prix-av">Dès</em><div class="pr-prix-ligne"><strong>9 500</strong></div></div>
+      <p class="pr-desc">Plateforme, e-commerce ou application métier.</p>
+      <p class="pr-incl">Ce qui est inclus</p>
+      <ul class="pr-liste"><li><span class="pr-ck"><svg viewBox="0 0 24 24"><path d="M6 12.4l4 4 8-8.6"/></svg></span>Cadrage complet</li></ul>
+      <button class="pr-cta">Demander un devis</button>
+    </article>
+  </div>
+</div></section>
+<script>
+window.MEASURE = function(){
+  const b1=document.getElementById('b1'), b2=document.getElementById('b2');
+  const c1=document.getElementById('c1'), c2=document.getElementById('c2'), c3=document.getElementById('c3');
+  const cx=document.createElement('canvas').getContext('2d');
+  cx.font='600 100px "Martian Mono"';
+  const adv=cx.measureText('M').width/100;
+  const r=e=>{const b=e.getBoundingClientRect();return {x:Math.round(b.x),y:Math.round(b.y),w:Math.round(b.width*10)/10,h:Math.round(b.height*10)/10,top:Math.round(b.top),bottom:Math.round(b.bottom)}};
+  const B1=r(b1),B2=r(b2),C1=r(c1),C2=r(c2),C3=r(c3);
+  const ring=5;
+  return {
+    viewport:window.innerWidth,
+    avanceMartianMono_em:Math.round(adv*1000)/1000,
+    fontLoaded:document.fonts.check('600 11px "Martian Mono"'),
+    badge1:B1, badge2:B2,
+    carte1:C1, carte2:C2, carte3:C3,
+    largeur_badge1_sur_carte:Math.round((B1.w+2*ring)/C1.w*1000)/10+'%',
+    debord_haut_badge1:(C1.top-B1.top)+ring,
+    centrage_badge1:{gauche:B1.x-C1.x, droite:(C1.x+C1.w)-(B1.x+B1.w)},
+    centrage_badge2:{gauche:B2.x-C2.x, droite:(C2.x+C2.w)-(B2.x+B2.w)},
+    // en mobile : distance entre le bas de la carte 1 et le haut du badge 2 (anneau compris)
+    gap_carte1bas_badge2haut:(B2.top-ring)-C1.bottom,
+    gap_carte2bas_carte3haut:C3.top-C2.bottom
+  };
+};
+</script>
+</body></html>

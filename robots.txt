@@ -1,0 +1,11 @@
+# Digistylze — 2026-08-04
+#
+# Aucun Disallow sur les pages geo, et c est deliberé : une URL interdite au
+# crawl ne peut pas etre lue, donc le <meta name="robots" content="noindex">
+# qu elle porte ne peut pas etre vu. Un Disallow ici gelerait ces pages dans
+# l index au lieu de les en sortir.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://digistylze.ch/sitemap.xml
