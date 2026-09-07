@@ -136,7 +136,7 @@ window.DTZ = window.DTZ || {};
  '<span class="mm__vitrine-sur">Par où commencer</span>' +
  '<b>Un appel de 30 minutes, un avis honnête.</b>' +
  '<p>On écoute votre projet et on vous dit franchement si on peut vous aider, plan d\'action chiffré à la clé.</p>' +
- '<a class="mm__vitrine-cta" href="contact.html" data-conversion="lead-cta-megamenu">' +
+ '<a class="mm__vitrine-cta" href="/contact/" data-conversion="lead-cta-megamenu">' +
  'Réserver un appel découverte' +
  '<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>' +
  '<span class="mm__vitrine-preuve">' + etoile + '4,9/5 sur Google · 64 avis</span>' +
@@ -254,7 +254,7 @@ window.DTZ = window.DTZ || {};
  '</div>' +
  '<div class="nav-drawer__body">' + body + '</div>' +
  '<div class="nav-drawer__foot">' +
- '<a href="contact.html" class="btn-pill" data-conversion="lead-cta-drawer">Audit gratuit</a>' +
+ '<a href="/contact/" class="btn-pill" data-conversion="lead-cta-drawer">Audit gratuit</a>' +
  '<span class="nav-drawer__tel">' +
  '<a href="tel:+41225068276">+41 22 506 82 76</a>' +
  '<a href="mailto:agence@digistylze.ch">agence@digistylze.ch</a>' +
